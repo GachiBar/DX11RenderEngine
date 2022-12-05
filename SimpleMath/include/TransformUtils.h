@@ -21,6 +21,7 @@ struct RenderData{
 	float  time;
 	matrix view;
 	matrix projection;
+	float4 viewPosition;
 };
 
 

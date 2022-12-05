@@ -125,6 +125,7 @@ void LightRenderPass::Render()
 
     size_t lastFlags = -1;
 
+    renderDevice->SetConstBuffer(pDataCB, &dataBuffer);
     renderDevice->VerifyConstBuffer(pDataCB, lightCosntBuffer.slot);
     
     renderDevice->VerifyPixelTexture(0, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("Diffuse"))->texture);

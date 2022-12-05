@@ -40,7 +40,7 @@ public:
     void SetupSettings(const RenderSettings& Settings) override;
 
 private:
-    LightCosntBuffer dataBuffer;
+    LightConstBuffer dataBuffer;
 
     Renderer::ConstBuffer* pDataCB;
 

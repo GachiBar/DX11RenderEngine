@@ -257,7 +257,7 @@ PSOutput psIn(PS_IN input)
 #endif
 	
 	float3 N = normalize(buf.Normal);
-	float3 V = normalize(lightCosntBuffer.ViewerPos.xyz - buf.WorldPos);
+	float3 V = normalize(coreConstants.viewPosition.xyz - buf.WorldPos);
 	float3 R = reflect(-V, N);
 	float3 H = normalize(V + L);
 	float3 albedo = buf.Diffuse.rgb;

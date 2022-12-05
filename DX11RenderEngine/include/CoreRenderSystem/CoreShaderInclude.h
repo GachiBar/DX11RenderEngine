@@ -64,6 +64,7 @@ struct CoreConstants {
 
     float time;
     float dt;
+	float4 viewPosition;
 };
 
 #ifndef HLSL

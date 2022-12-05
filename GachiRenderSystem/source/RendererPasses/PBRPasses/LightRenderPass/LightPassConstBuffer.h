@@ -13,11 +13,9 @@ struct LightDataBuffer
     float4 Color;
 };
 
-struct LightCosntBuffer {
+struct LightConstBuffer {
     matrix world;
-
-    float4 ViewerPos;
     LightDataBuffer Light;
 };
 
-STRUCTURE(1, LightCosntBuffer, lightCosntBuffer)
+STRUCTURE(1, LightConstBuffer, lightCosntBuffer)

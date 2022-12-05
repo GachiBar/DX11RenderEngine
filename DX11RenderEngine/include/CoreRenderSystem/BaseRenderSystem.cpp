@@ -26,6 +26,7 @@ bool BaseRenderSystem::Present()
 void BaseRenderSystem::SetRenderData(const RenderData& data){
 	viewConstants.dt = data.time - viewConstants.time; 
 	viewConstants.time = data.time;
+	viewConstants.viewPosition = data.viewPosition;
 	
 	viewConstants.pastMatrices = viewConstants.currentMatrices;
 	
@@ -44,6 +45,8 @@ void BaseRenderSystem::SetRenderData(const RenderData& data){
 	
 	
 	currentMatrices.reprojectionMatrix = viewProjection.InvertHighPrecision() * viewConstants.pastMatrices.viewProjection;
+
+	
 	
 	pRenderer->SetConstBuffer(pLocalConstants, &viewConstants);
 	
