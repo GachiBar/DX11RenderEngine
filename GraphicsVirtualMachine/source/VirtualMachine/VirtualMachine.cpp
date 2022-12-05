@@ -10,7 +10,6 @@ VirtualMachine::~VirtualMachine()
 
 
 
-
 void VirtualMachine::PushData(const void* data, uint32_t dataSize)
 {
     uint32_t position = dataQueue.size();

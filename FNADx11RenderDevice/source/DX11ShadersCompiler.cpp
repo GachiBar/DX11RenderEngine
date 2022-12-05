@@ -65,11 +65,16 @@ D3D11PixelShader* DX11ShadersCompiler::CompilePixelShader(const ShaderCompileDat
         throw ce;
     }
 #else
-        GFX_THROW_INFO(D3DCompile(shaderData, dataSize, NULL, d3ddefines.data(), (ID3DInclude*)includes, enteryPoint, target, flags, flags << 8u, &pPSData, &psErrorBlob));
+
+    GFX_THROW_INFO(
+        D3DCompile(shaderData.shaderData, shaderData.dataSize, NULL,
+            d3ddefines.data(), (ID3DInclude*)shaderData.includes,
+            shaderData.enteryPoint, shaderData.target,
+            shaderData.flags, shaderData.flags << 8u, &pPSData, &psErrorBlob));
 
     result->dataSize = pPSData->GetBufferSize();
     result->data = new char[result->dataSize];
-    memccpy(result->data, pPSData->GetBufferPointer(), 1, result->dataSize);
+    memcpy(result->data, pPSData->GetBufferPointer(), result->dataSize);
 
 #endif
     return result;
@@ -126,14 +131,14 @@ D3D11ComputeShader* DX11ShadersCompiler::CompileComputeShader(const ShaderCompil
         throw ce;
     }
 #else
-        GFX_THROW_INFO(
-                       D3DCompile(shaderData.shaderData, shaderData.dataSize, NULL,
-                           d3ddefines.data(), (ID3DInclude*)shaderData.includes,
-                           shaderData.enteryPoint,shaderData.target, shaderData.flags,
-                           shaderData.flags << 8u, &pPSData, &psErrorBlob));
+    GFX_THROW_INFO(
+        D3DCompile(shaderData.shaderData, shaderData.dataSize, NULL,
+            d3ddefines.data(), (ID3DInclude*)shaderData.includes,
+            shaderData.enteryPoint,shaderData.target, shaderData.flags,
+            shaderData.flags << 8u, &pPSData, &psErrorBlob));
     result->dataSize = pPSData->GetBufferSize();
     result->data = new char[result->dataSize];
-    memccpy(result->data, pPSData->GetBufferPointer(), 1, result->dataSize);
+    memcpy(result->data, pPSData->GetBufferPointer(), result->dataSize);
 
 #endif
     return result;
@@ -188,14 +193,14 @@ D3D11GeometryShader* DX11ShadersCompiler::CompileGeometryShader(const ShaderComp
         throw ce;
     }
 #else
-        GFX_THROW_INFO(
-                       D3DCompile(shaderData.shaderData, shaderData.dataSize,
-                           NULL, d3ddefines.data(), (ID3DInclude*)shaderData.includes,
-                           shaderData.enteryPoint, shaderData.target, shaderData.flags,
-                           shaderData.flags << 8u, &pPSData, &psErrorBlob));
+    GFX_THROW_INFO(
+        D3DCompile(shaderData.shaderData, shaderData.dataSize,
+            NULL, d3ddefines.data(), (ID3DInclude*)shaderData.includes,
+            shaderData.enteryPoint, shaderData.target, shaderData.flags,
+            shaderData.flags << 8u, &pPSData, &psErrorBlob));
     result->dataSize = pPSData->GetBufferSize();
     result->data = new char[result->dataSize];
-    memccpy(result->data, pPSData->GetBufferPointer(), 1, result->dataSize);
+    memcpy(result->data, pPSData->GetBufferPointer(), result->dataSize);
 #endif
     return result;
 }
@@ -270,11 +275,16 @@ D3D11VertexShader* DX11ShadersCompiler::CompileVertexShader(const ShaderCompileD
         throw;
     }
 #else
-    GFX_THROW_INFO(D3DCompile(shaderData, dataSize, NULL, d3ddefines.data(), (ID3DInclude*)includes, enteryPoint, target, flags, flags << 8u, &pVSData, &psErrorBlob));
-    
+
+    GFX_THROW_INFO(
+        D3DCompile(shaderData.shaderData, shaderData.dataSize, NULL,
+            d3ddefines.data(), (ID3DInclude*)shaderData.includes,
+            shaderData.enteryPoint, shaderData.target,
+            shaderData.flags, shaderData.flags << 8u, &pVSData, &psErrorBlob));
+
     result->dataSize = pVSData->GetBufferSize();
     result->data = new char[result->dataSize];
-    memccpy(result->data, pVSData->GetBufferPointer(), 1, result->dataSize);
+    memcpy(result->data, pVSData->GetBufferPointer(), result->dataSize);
 #endif
     return result;
 }
@@ -290,7 +300,7 @@ GVM::InputAssemblerDeclarationDesc DX11ShadersCompiler::ToGVM(const void* inputL
     };
 
     const D3D11_INPUT_ELEMENT_DESC* inputLayout = (const D3D11_INPUT_ELEMENT_DESC*)inputLayoutt;
-    
+
     GVM::InputAssemblerDeclarationDesc result;
     for (int i = 0; i < inputLayoutSize; i++)
     {

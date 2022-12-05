@@ -6,7 +6,6 @@
 #include "D3D11Renderer.h"
 
 #include <filesystem>
-#include <resource.h>
 #include "imgui/imgui_impl_dx11.h"
 #include "imgui/imgui_impl_win32.h"
 
@@ -26,7 +25,9 @@ RenderSystem::RenderSystem(RenderEngineInitStruct init, const BaseRenderSystemIn
     modelsManager(modelsManager),
     texturesManager(texturesManager),
     renderPassTAA(*this),
-    renderPassUP(*this)
+    renderPassUP(*this),
+    renderPassPP(*this),
+    renderPassSSAO(*this)
 {
     ImGui::CreateContext();
 
@@ -48,6 +49,8 @@ RenderSystem::RenderSystem(RenderEngineInitStruct init, const BaseRenderSystemIn
     renderPasses.push_back(&renderPassModels);
     renderPasses.push_back(&renderPassTAA);
     renderPasses.push_back(&renderPassUP);
+    renderPasses.push_back(&renderPassPP);
+    renderPasses.push_back(&renderPassSSAO);
     //managerImGUI.Init();
     //ImGui_ImplDX11_Init(pRenderer.device.Get(), pRenderer.context.Get());7
 
@@ -110,6 +113,10 @@ RenderSystem* RenderSystem::Initialise(RenderEngineInitStruct init)
     //todo
 }
 
+RenderSystem::~RenderSystem()
+{
+}
+
 void RenderSystem::BeginFrame()
 {
     for (auto pass : renderPasses)
@@ -155,7 +162,7 @@ bool RenderSystem::RenderFrame()
 
 
     pRenderer->BeginEvent("SSAO draw.");
-    //GFX_CATCH_RENDER(managerSSAO.Render(*this););
+    GFX_CATCH_RENDER(renderPassSSAO.Render(););
     pRenderer->EndEvent();
 
     pRenderer->BeginEvent("Sky draw.");
@@ -170,8 +177,8 @@ bool RenderSystem::RenderFrame()
     //GFX_CATCH_RENDER(managerBloom.Render(*this););
     pRenderer->EndEvent();
 
-    pRenderer->BeginEvent("End BSP draw.");
-    //GFX_CATCH_RENDER(managerPostProcess.Render(*this););
+    pRenderer->BeginEvent("PostProcess draw.");
+    GFX_CATCH_RENDER(renderPassPP.Render(););
     pRenderer->EndEvent();
 
     pRenderer->BeginEvent("TAA-pass.");

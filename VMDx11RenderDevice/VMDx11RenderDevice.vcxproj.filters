@@ -18,9 +18,6 @@
     <ClInclude Include="include\RenderDeviceDX11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\BaseDX11Classes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\BuffersViews\ConstBufferViewD3D11.h">
       <Filter>Header Files</Filter>
     </ClInclude>

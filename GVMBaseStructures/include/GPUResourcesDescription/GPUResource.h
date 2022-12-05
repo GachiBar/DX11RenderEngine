@@ -20,7 +20,7 @@ public:
     };
     
     ResourceView* id = nullptr;
-    IRenderDevice::IResourceView* view = nullptr;
+    IRenderDevice::RESOURCEVIEWHANDLE view = nullptr;
     Resource* resource = nullptr;
     EViewType type = EViewType::UNKNOWN;
     bool isRequiredUpdate = true;
@@ -59,10 +59,18 @@ protected:
 class GpuResource {
 
 public:
+    enum class ResourceState : uint8_t
+    {
+        Undefined,
+        Read,
+        Write
+    }; 
+    
     Resource* id = nullptr;
-    IRenderDevice::IResource* resource = nullptr;
+    IRenderDevice::RESOURCEHANDLE resource = nullptr;
     uint32_t resourceBindings = 0;
     bool isRequiredUpdate = true;
+    ResourceState currentState = ResourceState::Undefined;
 
     std::vector<ResourceView*> views;
 

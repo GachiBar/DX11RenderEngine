@@ -24,8 +24,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define HLSL
-#include "..\Quake-2\ref_dx11rg\DX11RenderEngine\DX11RenderEngine\include/CoreRenderSystem/CoreShaderInclude.h"
-#include "..\Quake-2\ref_dx11rg\DX11RenderEngine\QuakeRenderEngine/source/RendererPasses/TAARenderPass\TAARenderPassConstBuffer.h"
+#include "ref_dx11rg\DX11RenderEngine\DX11RenderEngine\include/CoreRenderSystem/CoreShaderInclude.h"
+#include "ref_dx11rg\DX11RenderEngine\QuakeRenderEngine/source/RendererPasses/TAARenderPass\TAARenderPassConstBuffer.h"
 
 // Whether to use real 16-bit floats
 // Use only with DXIL with SM6.2 and "-enable-16bit-types" as a compiler option
@@ -297,7 +297,7 @@ void main( uint3 inDispatchIdx : SV_DispatchThreadID, uint3 inGroupID : SV_Group
     const bool hasValidHistory = ( velocityConfidenceFactor * depthDiffFactor * uvWeight ) > 0.f;
     fp16_t4 finalColour = fp16_t4( 1.f, 1.f , 1.f , 1.f  );
 
-    if ( true == hasValidHistory )
+    if (false)
     {
         // sample history
         fp16_t4 rawHistoryColour = fp16_t4( GetHistory( prevFrameScreenUV, prevFrameScreenST, isOnEdge ) );

@@ -1,6 +1,6 @@
 #define HLSL
-#include "E:\Quake-2\ref_dx11rg\DX11RenderEngine\DX11RenderEngine\include\CoreRenderSystem\CoreShaderInclude.h"
-#include "E:\Quake-2\ref_dx11rg\DX11RenderEngine\QuakeRenderEngine\source\RendererPasses\UIRenderPass\UIRenderPassConstBuffer.h"
+#include "ref_dx11rg\DX11RenderEngine\DX11RenderEngine\include\CoreRenderSystem\CoreShaderInclude.h"
+#include "ref_dx11rg\DX11RenderEngine\QuakeRenderEngine\source\RendererPasses\UIRenderPass\UIRenderPassConstBuffer.h"
 
 
 struct VSIn {

@@ -86,7 +86,8 @@ void GVM::RenderGraph::AddCommand(RenderGraphNode Node,
     if (!Blocks.rbegin()->TryAdd(Node, ReadDependencies, WrightDependencies))
     {
         Blocks.push_back({});
-        assert(Blocks[Blocks.size() - 1].TryAdd(Node, ReadDependencies, WrightDependencies));
+        bool succses = (Blocks[Blocks.size() - 1].TryAdd(Node, ReadDependencies, WrightDependencies));
+        assert(succses);
     }
 }
 

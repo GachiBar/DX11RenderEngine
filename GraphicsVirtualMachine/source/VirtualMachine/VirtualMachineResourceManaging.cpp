@@ -246,7 +246,7 @@ void VirtualMachine::AddDisposeResource(const Resource* resource)
     auto& gpuResource = resourcesManager.Resources[(uintptr_t)resource];
     for (auto& resourceView : gpuResource.views )
     {
-        RenderDevice->DestroyResource(resourcesManager.GetRealResourceView(resourceView));
+        RenderDevice->DestroyResourceView(resourcesManager.GetRealResourceView(resourceView));
     }
     RenderDevice->DestroyResource(resourcesManager.GetRealResource(resource));
     resourcesManager.AddDisposeResource(resource);
@@ -254,7 +254,7 @@ void VirtualMachine::AddDisposeResource(const Resource* resource)
 
 void VirtualMachine::AddDisposeResourceView(const ResourceView* resourceView)
 {
-    RenderDevice->DestroyResource(resourcesManager.GetRealResourceView(resourceView));
+    RenderDevice->DestroyResourceView(resourcesManager.GetRealResourceView(resourceView));
     resourcesManager.AddDisposeResourceView(resourceView);
 }
 

@@ -114,20 +114,8 @@
     <ClCompile Include="source\RendererPasses\OldRenderPasses\SkyboxRenderer\SkyboxRendererFactory.cpp">
       <Filter>Source Files\Providers</Filter>
     </ClCompile>
-    <ClCompile Include="source\RendererPasses\OldRenderPasses\SSAORenderer\SSAORenderer.cpp">
-      <Filter>Source Files\RenderPasses</Filter>
-    </ClCompile>
-    <ClCompile Include="source\RendererPasses\OldRenderPasses\TAARenderer\TAARenderer.cpp">
-      <Filter>Source Files\RenderPasses</Filter>
-    </ClCompile>
     <ClCompile Include="source\ResourceManagers\TexturesManager.cpp">
       <Filter>Source Files\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="source\RendererPasses\OldRenderPasses\UIRenderer\UIRenderer.cpp">
-      <Filter>Source Files\RenderPasses</Filter>
-    </ClCompile>
-    <ClCompile Include="source\RendererPasses\OldRenderPasses\UIRenderer\UIRendererFactory.cpp">
-      <Filter>Source Files\Providers</Filter>
     </ClCompile>
     <ClCompile Include="source\RendererPasses\ModelsRenderPass\ModelsPassConstBuffer.cpp">
       <Filter>NewRenderPasses\ModelsRenderpass</Filter>
@@ -147,9 +135,6 @@
     <ClCompile Include="source\RendererPasses\UIRenderPass\UIRenderPassProvider.cpp">
       <Filter>NewRenderPasses\UIRenderPass</Filter>
     </ClCompile>
-    <ClCompile Include="source\RendererPasses\OldRenderPasses\PPRenderPass\PPRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\RendererPasses\TAARenderPass\halton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -159,13 +144,16 @@
     <ClCompile Include="source\RendererPasses\TAARenderPass\TAARenderPassProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\RendererPasses\UPRenderer\UPRenderer.cpp">
+    <ClCompile Include="source\RendererPasses\PPRenderPass\PPRenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\RendererPasses\UPRenderer\UPRendererFactory.cpp">
+    <ClCompile Include="source\RendererPasses\SSAORenderPass\SSAORenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\RendererPasses\UPRenderer\UPRendererProvider.cpp">
+    <ClCompile Include="source\RendererPasses\UPRenderPass\UPRenderPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\RendererPasses\UPRenderPass\UPRenderPassProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -266,35 +254,8 @@
     <ClInclude Include="source\RendererPasses\OldRenderPasses\SkyboxRenderer\SkyboxRendererFactory.h">
       <Filter>Header files\Factories</Filter>
     </ClInclude>
-    <ClInclude Include="source\RendererPasses\OldRenderPasses\SSAORenderer\SSAORenderer.h">
-      <Filter>Header files\RenderPasses</Filter>
-    </ClInclude>
-    <ClInclude Include="source\RendererPasses\OldRenderPasses\SSAORenderer\SSAORendererConstBuffer.h">
-      <Filter>Header files\ConstBuffers</Filter>
-    </ClInclude>
-    <ClInclude Include="source\RendererPasses\OldRenderPasses\SSAORenderer\SSAORendererFactory.h">
-      <Filter>Header files\Factories</Filter>
-    </ClInclude>
-    <ClInclude Include="source\RendererPasses\OldRenderPasses\TAARenderer\TAARenderer.h">
-      <Filter>Header files\RenderPasses</Filter>
-    </ClInclude>
-    <ClInclude Include="source\RendererPasses\OldRenderPasses\TAARenderer\TAARendererConstBuffer.h">
-      <Filter>Header files\ConstBuffers</Filter>
-    </ClInclude>
     <ClInclude Include="source\ResourceManagers\TexturesManager.h">
       <Filter>Header files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="source\RendererPasses\OldRenderPasses\TAARenderer\TAARendererFactory.h">
-      <Filter>Header files\Factories</Filter>
-    </ClInclude>
-    <ClInclude Include="source\RendererPasses\OldRenderPasses\UIRenderer\UIRenderer.h">
-      <Filter>Header files\RenderPasses</Filter>
-    </ClInclude>
-    <ClInclude Include="source\RendererPasses\OldRenderPasses\UIRenderer\UIConstBuffers.h">
-      <Filter>Header files\ConstBuffers</Filter>
-    </ClInclude>
-    <ClInclude Include="source\RendererPasses\OldRenderPasses\UIRenderer\UIRendererFactory.h">
-      <Filter>Header files\Factories</Filter>
     </ClInclude>
     <ClInclude Include="source\RendererPasses\OldRenderPasses\SkyboxRenderer\SkyboxRenderer.h">
       <Filter>Header files\RenderPasses</Filter>
@@ -323,15 +284,6 @@
     <ClInclude Include="source\DynamicMeshBuffer.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="source\RendererPasses\OldRenderPasses\PPRenderPass\PPConstBuffer.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\RendererPasses\OldRenderPasses\PPRenderPass\PPRendererFactory.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\RendererPasses\OldRenderPasses\PPRenderPass\PPRenderPass.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
     <ClInclude Include="source\RendererPasses\TAARenderPass\halton.h">
       <Filter>Header files</Filter>
     </ClInclude>
@@ -344,13 +296,22 @@
     <ClInclude Include="source\RendererPasses\TAARenderPass\TAARenderPassProvider.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="source\RendererPasses\UPRenderer\UPConstBuffers.h">
+    <ClInclude Include="source\RendererPasses\PPRenderPass\PPConstBuffer.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="source\RendererPasses\UPRenderer\UPRenderer.h">
+    <ClInclude Include="source\RendererPasses\PPRenderPass\PPRenderPass.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="source\RendererPasses\UPRenderer\UPRendererFactory.h">
+    <ClInclude Include="source\RendererPasses\SSAORenderPass\SSAORenderPass.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RendererPasses\SSAORenderPass\SSAORendererConstBuffer.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RendererPasses\UPRenderPass\UPConstBuffers.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RendererPasses\UPRenderPass\UPRenderPass.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

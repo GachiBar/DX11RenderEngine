@@ -1,6 +1,6 @@
 #define HLSL
-#include "\ref_dx11rg\DX11RenderEngine\DX11RenderEngine\source\CoreRenderSystem\CoreShaderInclude.h"
-#include "\ref_dx11rg\DX11RenderEngine\DX11RenderEngine\source\CoreRenderSystem\Renderers\BloomRenderer\BloomConstBuffer.h"
+#include "ref_dx11rg\DX11RenderEngine\DX11RenderEngine\source\CoreRenderSystem\CoreShaderInclude.h"
+#include "ref_dx11rg\DX11RenderEngine\DX11RenderEngine\source\CoreRenderSystem\Renderers\BloomRenderer\BloomConstBuffer.h"
 
 struct VSIn {
 	float2 pos : Position;

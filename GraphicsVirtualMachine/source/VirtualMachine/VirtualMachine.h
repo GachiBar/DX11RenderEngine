@@ -107,6 +107,8 @@ public:
     VirtualMachine(const VirtualMachine&&) = delete;
     ~VirtualMachine();
 
+    void SyncResourcesRead(const std::vector<Resource*>& resorces);
+    void SyncResourcesWrite(const std::vector<Resource*>& resorces);
     void RunVM();
     void AddComand();
     void Present();

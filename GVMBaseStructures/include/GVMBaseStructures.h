@@ -29,6 +29,14 @@ struct FColor
     // FColor(uint8_t r,uint8_t g,uint8_t b,uint8_t a):Color{r*1.f/255,g*1.f/255,b*1.f/255,a*1.f/255}{}
 
     float Color[4] = {0, 0, 0, 0};
+
+    bool operator==(const FColor&) const
+    {
+        return Color[0] == Color[0] &&
+            Color[1] == Color[1] &&
+            Color[2] == Color[2] &&
+            Color[3] == Color[3];
+    }
 };
 
 struct UBox
@@ -46,7 +54,9 @@ struct UBox
         Front(Front),
         Right(Right),
         Bottom(Bottom),
-        Back(Back){};
+        Back(Back)
+    {
+    };
 
     UBox(uint32_t Left,
          uint32_t Top,
@@ -59,8 +69,10 @@ struct UBox
         Front(Front),
         Right(Right),
         Bottom(Bottom),
-        Back(Back){};
-    
+        Back(Back)
+    {
+    };
+
     uint32_t Left;
     uint32_t Top;
     uint32_t Front;

@@ -78,13 +78,13 @@ class ResourcesManager {
     GpuResourceView& GetResourceView(const ResourceView* resourceView);
 
 public:
-    IRenderDevice::IResource* GetRealResource(const Resource* resource);
-    IRenderDevice::IResourceView* GetRealResourceView(const ResourceView* resourceView);
+    IRenderDevice::RESOURCEHANDLE GetRealResource(const Resource* resource);
+    IRenderDevice::RESOURCEVIEWHANDLE GetRealResourceView(const ResourceView* resourceView);
     
 
 
-    IRenderDevice::IShader* GetRealShader(const Shader* shader);
-    IRenderDevice::IInputLayout* GetRealInputLayout(const InputLayout* inputLayout);
+    IRenderDevice::SHADERHANDLE GetRealShader(const Shader* shader);
+    IRenderDevice::INPUTLAYOUTHANDLE GetRealInputLayout(const InputLayout* inputLayout);
     
     void AddDisposeResource(const Resource* resource);
     void AddDisposeResourceView(const ResourceView* resourceView);

@@ -247,7 +247,7 @@ void GraphicsApi::SetupRenderTargets(RenderTargetView* renderTargets[], int32_t 
     {
         ps->RenderTargets[i + offset].rtv = renderTargets[i];
     }
-    ps->renderTargetsNum =offset + num;
+    ps->renderTargetsNum = offset + num;
 }
 void GraphicsApi::SetupRenderTarget(RenderTargetView* renderTarget, int32_t slot, DepthStencilView* depthStencilBuffer)
 {

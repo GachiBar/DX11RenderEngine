@@ -1,5 +1,4 @@
 #pragma once
-#include "UPRendererFactory.h"
 #include "UPConstBuffers.h"
 #include "CoreRenderSystem/RenderPasses/BaseRenderPass.h"
 #include "ResourceManagers/TexturesManager.h"
@@ -8,14 +7,14 @@
 
 
 
-class UPRenderer : public BaseRenderPass {
-	struct UPRendererProvider;
+class UPRenderPass : public BaseRenderPass {
+	struct UPRenderPassProvider;
 
-	UPRendererProvider* provider = nullptr;
+	UPRenderPassProvider* provider = nullptr;
 
-	struct UPRendererProvider : public Renderer::IStateProvider {
+	struct UPRenderPassProvider : public Renderer::IStateProvider {
 		int32_t width, height;
-		UPRendererProvider();
+		UPRenderPassProvider();
 		virtual void PatchPipelineState(Renderer::Pipeline* refToPS, size_t definesFlags) override;
 		virtual  Renderer::InputLayoutDescription GetInputLayoutDescription(size_t definesFlags) override;
 		virtual const char* GetShaderName() override;
@@ -35,7 +34,7 @@ class UPRenderer : public BaseRenderPass {
 
 public:
 
-	UPRenderer(BaseRenderSystem& renderSystem);
+	UPRenderPass(BaseRenderSystem& renderSystem);
 
 	virtual void Init(const char* dirr) override;
 
@@ -48,7 +47,7 @@ public:
 	void Flush();
 	virtual void PostRender() override;
 
-	~UPRenderer() override;
+	~UPRenderPass() override;
 
 private:
 

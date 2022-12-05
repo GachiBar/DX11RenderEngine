@@ -4,9 +4,11 @@
 
 #include "CoreRenderSystem/RenderPasses/IMGUIRenderPass/ImGUIRenderPass.h"
 #include "RendererPasses/ModelsRenderPass/ModelsRenderPass.h"
+#include "RendererPasses/PPRenderPass/PPRenderPass.h"
+#include "RendererPasses/SSAORenderPass/SSAORenderPass.h"
 #include "RendererPasses/TAARenderPass/TAARenderPass.h"
 #include "RendererPasses/UIRenderPass/UIRenderPass.h"
-#include "RendererPasses/UPRenderer/UPRenderer.h"
+#include "RendererPasses/UPRenderPass/UPRenderPass.h"
 #include "ResourceManagers/ModelsManager.h"
 #include "Utils/DrawData.h"
 
@@ -31,7 +33,7 @@ class RenderSystem: public BaseRenderSystem{
 	RenderSystem& operator=(const RenderSystem&) = delete;
 public:
 	static RenderSystem* Initialise(RenderEngineInitStruct);
-	~RenderSystem() = default;
+	~RenderSystem() override;
 
 
 	void BeginFrame();
@@ -90,7 +92,9 @@ private:
 	ModelsRenderPass		 renderPassModels;
 	ImGUIRenderPass			 renderPassIMGUI;
 	TAARenderPass			 renderPassTAA;
-	UPRenderer				 renderPassUP;
+	UPRenderPass			 renderPassUP;
+	PPRenderPass			 renderPassPP;
+	SSAORenderPass			 renderPassSSAO;
 	
 	//MotionBlurRenderer	 managerMB;
 	//PPRenderer			 managerPostProcess;

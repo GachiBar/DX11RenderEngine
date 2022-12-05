@@ -4,11 +4,6 @@
 #include <map>
 #include <vector>
 
-enum UsedShaders: uint16_t {
-    UseGeometryShader = 1,
-    UseComputeShader = 2,
-};
-
 struct PipelineFactoryFlags {
 
     PipelineFactoryFlags(): flags(0) {}

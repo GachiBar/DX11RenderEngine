@@ -1,6 +1,6 @@
 #define HLSL
-#include "E:\Quake-2\ref_dx11rg\DX11RenderEngine\DX11RenderEngine\include\CoreRenderSystem\CoreShaderInclude.h"
-#include "../Quake-2/ref_dx11rg/DX11RenderEngine/QuakeRenderEngine/source/RendererPasses/UPRenderer/UPConstBuffers.h"
+#include "ref_dx11rg\DX11RenderEngine\DX11RenderEngine\include\CoreRenderSystem\CoreShaderInclude.h"
+#include "ref_dx11rg/DX11RenderEngine/QuakeRenderEngine/source/RendererPasses/UPRenderPass/UPConstBuffers.h"
 
 struct VSIn {
 	float3 pos     : Position;

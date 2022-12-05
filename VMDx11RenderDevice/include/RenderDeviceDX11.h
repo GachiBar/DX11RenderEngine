@@ -3,13 +3,21 @@
 #define GVM_MSW
 
 #include "winHandler.h"
+
+#define DX11
+
 #include "IRenderDevice.h"
 #include "GraphicsExceptions/DxgiInfoManager.h"
 
 
+#ifndef  TESTDEBUG 
+#define TESTDEBUG 1
+#endif
+
+
+
 
 namespace GVM {
-class ResourceViewDX12;
 
 struct Dx11PlatformHandle : public PlatformHandle {
 
@@ -35,7 +43,7 @@ public:
 
 #pragma region Fields
 
-#ifdef _DEBUG
+#if _DEBUG | TESTDEBUG
     DxgiInfoManager infoManager;
 #endif
     
@@ -51,6 +59,28 @@ public:
     bool GS = false;
     bool HS = false;
     bool DS = false;
+    IUnknown* CSPtr = nullptr;
+    IUnknown* PSPtr = nullptr;
+    IUnknown* VSPtr = nullptr;
+    IUnknown* GSPtr = nullptr;
+    IUnknown* HSPtr = nullptr;
+    IUnknown* DSPtr = nullptr;
+    ID3D11BlendState* blendStatePtr;
+    FColor blendFactorHash;
+    ID3D11DepthStencilState* depthStencilStatePtr;
+    ID3D11RasterizerState* rasterizerStatePtr;
+    EPrimitiveTopology topologyHash;
+    ID3D11SamplerState* Samplers[16] = {};
+    uint8_t samplersNum = 0;
+    D3D11_VIEWPORT d3d11viewports[20];
+    uint8_t d3d11viewportsNum = 0;
+    uint8_t texturesNum = 0;
+    IUnknown* indexBufferPtr = nullptr;
+    uint8_t vertexBuffersNum = 0;
+    int32_t renderTargetsNum = 0;
+    ID3D11Buffer* constBuffersPtr[32];
+    uint8_t constBuffersNum = 0;
+    IInputLayout* layoutPtr;
 
 private:
     wrl::ComPtr<ID3DUserDefinedAnnotation> perf;
@@ -96,8 +126,8 @@ private:
     std::vector<ID3D11Buffer*> vertexBuffers;
     std::vector<uint32_t> vertexBufferOffsets;
     std::vector<uint32_t> vertexBufferStrides;
-    ResourceViewDX12* indexBuffer;
-    ResourceViewDX12* vertexBuffer;
+    //ResourceViewDX12* indexBuffer;
+    //ResourceViewDX12* vertexBuffer;
     size_t indexElementSize;
 
     ///* Resource Caches */
@@ -137,7 +167,8 @@ private:
 protected:
 
     IResource* CreateResource(const GpuResource& ResourceDesc) override;
-    void DestroyResource(IPlaceable* resource) override;
+    void DestroyResource(IResource* const resource) override;
+    void DestroyResourceView(IResourceView* const resource) override;
     IResourceView* CreateResourceView(const GpuResourceView& desc, const GpuResource& ResourceDesc) override;
 
     IShader* CreateShader(const ShaderDesc& desc) override;
@@ -150,26 +181,27 @@ protected:
 
 #pragma region SetupPipeline
     
-    virtual void SetupViewports(const Compressed::ViewportDesc viewports[], uint8_t num);
-    virtual void SetupBlendState(const Compressed::CoreBlendDesc& blendState);
-    virtual void SetupDepthStencilState(const Compressed::DepthStencilStateDesc& depthStencilState);
-    virtual void SetupRasterizerState(const Compressed::RasterizerStateDesc& rasterizerState);
-    virtual void SetupSamplers(const Compressed::SamplerStateDesc samplers[], uint8_t num);
-    virtual void SetupPrimitiveTopology(const EPrimitiveTopology topology);
+    void SetupViewports(const Compressed::ViewportDesc viewports[], uint8_t num);
+    void SetupBlendState(const Compressed::CoreBlendDesc& blendState);
+    void SetupDepthStencilState(const Compressed::DepthStencilStateDesc& depthStencilState);
+    void SetupRasterizerState(const Compressed::RasterizerStateDesc& rasterizerState);
+    void SetupSamplers(const Compressed::SamplerStateDesc samplers[], uint8_t num);
+    void SetupPrimitiveTopology(const EPrimitiveTopology topology);
+    void SetupShader(IShader* shader, EShaderType type);
+    void SetupInputLayout(IInputLayout* layout);
 
-    virtual void SetupVertexBuffer(const IVertexBufferView* vertexBuffers[], uint8_t num);
-    virtual void SetupIndexBuffer(const IIndexBufferView* indices);
-    virtual void SetupTextures(IResourceView* textures[], uint8_t num);
-    virtual void SetupRenderTargets(const IRenderTargetView* renderTargets[], int32_t num, IDepthStencilView* depthStencilBuffer);
-    virtual void SetupUATargets(const IUATargetView* uaTargets[], uint8_t num) override;
-    
-    virtual void SetupShader(IShader* shader, EShaderType type);
-    virtual void SetupConstBuffers(IConstBufferView* constBuffers[], uint8_t num);
-    void SetupInputLayout(IInputLayout* layout) override;
+    virtual void SetupPipeline(const PipelineDescription& Pipeline) override;
+    virtual void SetupVertexBuffers(IVertexBufferView* const vertexBuffers[], uint8_t num) override;
+    virtual void SetupIndexBuffers(IIndexBufferView* const indices) override;
+    virtual void SetupTextures(IResourceView* textures[], uint8_t num)  override;
+    virtual void SetupRenderTargets(IRenderTargetView* const renderTargets[], int32_t num, IDepthStencilView* depthStencilBuffer)  override;
+    virtual void SetupUATargets(IUATargetView* uaTargets[], uint8_t num) override;
+    virtual void SetupConstBuffers(IConstBufferView* constBuffers[], uint8_t num) override;
+
     void ClearState() override;
     
-    void ClearRenderTarget(const IRenderTargetView* rtView, FColor color) override;
-    void ClearDepthStencil(const IDepthStencilView* dsView, float depth, int8_t stencil) override;
+    void ClearRenderTarget(IRenderTargetView* rtView, FColor color) override;
+    void ClearDepthStencil(IDepthStencilView* dsView, float depth, int8_t stencil) override;
 
 
 #pragma endregion
@@ -179,7 +211,7 @@ protected:
     void BeginEvent(const char* name) override;
     void EndEvent() override;
 
-    void* GetNativeTexture(const IResourceView* view) override;
+    void* GetNativeTexture(IResourceView* view) override;
 public:
     
     void GetBackbufferSize(uint32_t& w, uint32_t& h) override;

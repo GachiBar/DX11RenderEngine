@@ -545,22 +545,22 @@ GPUInputLayout& ResourcesManager::CreateInputLayout(const InputAssemblerDeclarat
     return SavedInputLayouts[index];
 }
 
-IRenderDevice::IResource* ResourcesManager::GetRealResource(const Resource* resource)
+IRenderDevice::RESOURCEHANDLE ResourcesManager::GetRealResource(const Resource* resource)
 {
     return Resources[reinterpret_cast<uintptr_t>(resource)].resource;
 }
 
-IRenderDevice::IResourceView* ResourcesManager::GetRealResourceView(const ResourceView* resourceView)
+IRenderDevice::RESOURCEVIEWHANDLE ResourcesManager::GetRealResourceView(const ResourceView* resourceView)
 {
     return ResourceViews[reinterpret_cast<uintptr_t>(resourceView)].view;
 }
 
-IRenderDevice::IShader* ResourcesManager::GetRealShader(const Shader* shader)
+IRenderDevice::SHADERHANDLE ResourcesManager::GetRealShader(const Shader* shader)
 {
     return SavedShaders[reinterpret_cast<uintptr_t>(shader)].shader;
 }
 
-IRenderDevice::IInputLayout* ResourcesManager::GetRealInputLayout(const InputLayout* inputLayout)
+IRenderDevice::INPUTLAYOUTHANDLE ResourcesManager::GetRealInputLayout(const InputLayout* inputLayout)
 {
     return SavedInputLayouts[reinterpret_cast<uintptr_t>(inputLayout)].inputLayout;
 }

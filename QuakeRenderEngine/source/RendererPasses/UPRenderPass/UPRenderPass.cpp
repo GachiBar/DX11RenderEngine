@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "UPRenderer.h"
+#include "UPRenderPass.h"
 
 #include "ResourceManagers/States/Samplers.h"
 
@@ -7,7 +7,7 @@
 using namespace Renderer;
 
 
-UPRenderer::UPRenderer(BaseRenderSystem& renderSystem) :
+UPRenderPass::UPRenderPass(BaseRenderSystem& renderSystem) :
 BaseRenderPass({"BSPShader.hlsl", renderSystem}),
 staticMeshes(renderSystem.pRenderer, 20000, 20000), dynamicMeshes(renderSystem.pRenderer, 2000, 2000)
 {
@@ -28,11 +28,11 @@ staticMeshes(renderSystem.pRenderer, 20000, 20000), dynamicMeshes(renderSystem.p
 	lightSampler.maxAnisotropy = 16;
 }
 
-void UPRenderer::Init(const char* dirr) {
-    BaseRenderPass::Init(dirr, new UPRendererProvider());
+void UPRenderPass::Init(const char* dirr) {
+    BaseRenderPass::Init(dirr, new UPRenderPassProvider());
 }
 
-MeshHashData UPRenderer::Register(UPModelMesh model, bool dynamic) {
+MeshHashData UPRenderPass::Register(UPModelMesh model, bool dynamic) {
 	if (dynamic) {
 		return dynamicMeshes.AddMesh(model);
 	}
@@ -41,14 +41,14 @@ MeshHashData UPRenderer::Register(UPModelMesh model, bool dynamic) {
 	}
 }
 
-void UPRenderer::Draw(MeshHashData model, TexturesManager::TextureCache texture, UPDrawData data) {
+void UPRenderPass::Draw(MeshHashData model, TexturesManager::TextureCache texture, UPDrawData data) {
 	drawCalls.emplace_back(model, texture, data);
 }
-void UPRenderer::Draw(MeshHashData model, TexturesManager::TextureCache texture, TexturesManager::TextureCache lightMap, UPDrawData data) {
+void UPRenderPass::Draw(MeshHashData model, TexturesManager::TextureCache texture, TexturesManager::TextureCache lightMap, UPDrawData data) {
 	drawCalls.emplace_back(model, texture, lightMap, data);
 }
 
-void UPRenderer::DrawSet(MeshHashData model, UPModelMesh newModel, TexturesManager::TextureCache texture, UPDrawData data) {
+void UPRenderPass::DrawSet(MeshHashData model, UPModelMesh newModel, TexturesManager::TextureCache texture, UPDrawData data) {
 
 	if (data.dynamic) {
 		dynamicMeshes.UpdateMesh(model, newModel);
@@ -61,7 +61,7 @@ void UPRenderer::DrawSet(MeshHashData model, UPModelMesh newModel, TexturesManag
 	drawCalls.emplace_back(model, texture, data);
 }
 
-void UPRenderer::Render() {
+void UPRenderPass::Render() {
 	
 	RenderTargetBinding* targets[] = {
 		 baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("diffuseColor")),
@@ -85,8 +85,8 @@ void UPRenderer::Render() {
 
 	renderDevice->VerifyConstBuffer(pDataCB, upCosntBuffer.slot);
 
-	renderDevice->VerifyPixelSampler(0, Samplers::anisotropic16);
-	renderDevice->VerifyPixelSampler(1, Samplers::anisotropic16);
+	renderDevice->VerifyPixelSampler(0, Samplers::pointClamp);
+	renderDevice->VerifyPixelSampler(1, Samplers::linearClamp);
 
 
 
@@ -131,12 +131,12 @@ void UPRenderer::Render() {
 	}
 }
 
-void UPRenderer::Flush() {
+void UPRenderPass::Flush() {
 	staticMeshes.Flush();
 	dynamicMeshes.Flush();
 }
 
-void UPRenderer::PostRender()
+void UPRenderPass::PostRender()
 {
 	for (auto& drawCall: drawCalls)
 	{
@@ -151,12 +151,12 @@ void UPRenderer::PostRender()
 
 }
 
-void UPRenderer::Destroy() {
+void UPRenderPass::Destroy() {
 
 	renderDevice->AddDisposeConstBuffer(pDataCB);
 	delete factory;
 }
-void UPRenderer::PreRender()
+void UPRenderPass::PreRender()
 {
 	
 	RenderTargetBinding* targets[] = {
@@ -171,12 +171,12 @@ void UPRenderer::PreRender()
 }
 
 
-UPRenderer::~UPRenderer() { Destroy(); }
+UPRenderPass::~UPRenderPass() { Destroy(); }
 
-UPRenderer::DrawCall::DrawCall(MeshHashData model, TexturesManager::TextureCache texture, UPDrawData data) :
+UPRenderPass::DrawCall::DrawCall(MeshHashData model, TexturesManager::TextureCache texture, UPDrawData data) :
 	model(model), texture(texture), data(data) {}
 
-UPRenderer::DrawCall::DrawCall(MeshHashData model, TexturesManager::TextureCache texture, TexturesManager::TextureCache lightMap, UPDrawData data) :
+UPRenderPass::DrawCall::DrawCall(MeshHashData model, TexturesManager::TextureCache texture, TexturesManager::TextureCache lightMap, UPDrawData data) :
 	DrawCall(model, texture, data) {
 	this->lightMap = lightMap;
 }

@@ -10,7 +10,7 @@ public:
     GPUInputLayout(const InputAssemblerDeclarationDesc& desc, int id);
     
     InputAssemblerDeclarationDesc description;
-    IRenderDevice::IInputLayout* inputLayout = nullptr;
+    IRenderDevice::INPUTLAYOUTHANDLE inputLayout = nullptr;
     int id = -1;
 
 

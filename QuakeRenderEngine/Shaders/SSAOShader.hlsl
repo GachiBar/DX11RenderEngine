@@ -1,6 +1,6 @@
 #define HLSL
-#include "..\Quake-2\ref_dx11rg\DX11RenderEngine\DX11RenderEngine\source\CoreRenderSystem/CoreShaderInclude.h"
-#include "..\Quake-2\ref_dx11rg\DX11RenderEngine\DX11RenderEngine\source\CoreRenderSystem\Renderers\SSAORenderer\SSAORendererConstBuffer.h"
+#include "ref_dx11rg\DX11RenderEngine\DX11RenderEngine\include\CoreRenderSystem/CoreShaderInclude.h"
+#include "ref_dx11rg\DX11RenderEngine\QuakeRenderEngine\source\RendererPasses\SSAORenderPass\SSAORendererConstBuffer.h"
 
 //#define BLUR
 
@@ -79,13 +79,13 @@ void main( uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID, uint3 DTid : S
 
 	// Get viewspace normal and z-coord of this pixel.  
     float3 n = normalize(gNormalMap.SampleLevel(gsamPointClamp, uv, 0.0f).xyz) ;
-	n = normalize(mul(float4(n, 0), mainConstants.view));
+	n = normalize(mul(float4(n, 0), coreConstants.currentMatrices.view)).xyz;
     float pz = gDepthMap.SampleLevel(gsamDepthMap, uv, 0.0f).r;;
 	
 	
 	float4 H = float4(uv.x * 2 - 1, (1 - uv.y) * 2 - 1, pz, 1);
 	// Transform by the view-projection inverse.
-	float4 D = mul(H, mainConstants.inverseProjection);
+	float4 D = mul(H, coreConstants.currentMatrices.inverseProjection);
     //pz = NdcDepthToViewDepth(pz);
 	
 
@@ -95,7 +95,7 @@ void main( uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID, uint3 DTid : S
 	// p.z = t*PosV.z
 	// t = p.z / PosV.z
 	//
-	float3 p = D/D.w;
+	float3 p = D.xyz/D.w;
 	// Extract random vector and map from [0,1] --> [-1, +1].
 	float3 randVec = 2.0f*gRandomVecMap.SampleLevel(gsamLinearWrap, 4.0f*uv*1.0, 0.0f).rgb - 1.0f;
 
@@ -132,8 +132,8 @@ void main( uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID, uint3 DTid : S
 		// lies on the ray of q, so there exists a t such that r = t*q.
 		// r.z = t*q.z ==> t = r.z / q.z
 		H = float4(projQ.x * 2 - 1, (1 - projQ.y) * 2 - 1, rz, 1);
-		D = mul(H, mainConstants.inverseProjection);
-		float3 r = D/D.w;
+		D = mul(H, coreConstants.currentMatrices.inverseProjection);
+		float3 r = D.xyz/D.w;
 		
 		//
 		// Test whether r occludes p.
@@ -170,7 +170,7 @@ void main( uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID, uint3 DTid : S
 static const int gMaxBlurRadius = 5;
 
 
-Texture2D InputBuf        : register(t0);
+Texture2D<float> InputBuf        : register(t0);
 RWTexture2D<float> Result : register(u0);
 
 
@@ -178,7 +178,7 @@ RWTexture2D<float> Result : register(u0);
 
 static  float Weights[5];
 
-float3 BlurPixels( float a, float b, float c, float d, float e, float f, float g, float h, float i )
+float BlurPixels( float a, float b, float c, float d, float e, float f, float g, float h, float i )
 {
     return Weights[0]*e + Weights[1]*(d+f) + Weights[2]*(c+g) + Weights[3]*(b+h) + Weights[4]*(a+i);
 }
@@ -297,7 +297,7 @@ void blur( uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID, uint3 DTid : S
 
 #ifdef COPY
 
-Texture2D InputBuf        : register(t0);
+Texture2D<float> InputBuf        : register(t0);
 RWTexture2D<float> Result : register(u0);
 
 [numthreads( SSAO_NUM_THREADS_X, SSAO_NUM_THREADS_Y, 1 )]
@@ -309,7 +309,7 @@ void copy( uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID, uint3 DTid : S
 	int2 GroupUL = (Gid.xy << 3) - 4;                // Upper-left pixel coordinate of group read location
 	int2 ThreadUL = (GTid.xy << 1) + GroupUL;        // Upper-left pixel coordinate of quad that this thread will read
 	
-	Result[DTid.xy] = InputBuf[DTid.xy];
+	Result[DTid.xy] = InputBuf[DTid.xy].x;
 }
 
 

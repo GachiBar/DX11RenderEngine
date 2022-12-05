@@ -1,6 +1,6 @@
 #define HLSL
-#include "..\Quake-2\ref_dx11rg\DX11RenderEngine\DX11RenderEngine\source\CoreRenderSystem/CoreShaderInclude.h"
-#include "..\Quake-2\ref_dx11rg\DX11RenderEngine\DX11RenderEngine\source\CoreRenderSystem/Renderers/PPRenderer\PPConstBuffer.h"
+#include "ref_dx11rg\DX11RenderEngine\DX11RenderEngine\include\CoreRenderSystem/CoreShaderInclude.h"
+#include "ref_dx11rg\DX11RenderEngine\QuakeRenderEngine\source\RendererPasses/PPRenderPass/PPConstBuffer.h"
 
 struct VSIn
 {
@@ -25,12 +25,11 @@ PSIn vsIn(VSIn input)
 
 
 Texture2D diffuseColor : register(t0);
+
 Texture2D bloomMask : register(t1);
-Texture2D lightmap : register(t2);
-Texture2D depthTex : register(t3);
-Texture2D alphaSurfaces : register(t4);
-Texture2D occlusion : register(t8);
-Texture2D normals : register(t9);
+Texture2D lightmap : register(t2);;
+Texture2D alphaSurfaces : register(t3);
+Texture2D occlusion : register(t4);
 
 
 SamplerState blureSampler : register(s0);
@@ -41,45 +40,22 @@ float4 psIn(PSIn input) : SV_Target
     float4 x = 0;
     float2 texCoord = input.uv;
 
-#ifdef BLOOMONLY
-	return bloomMask.Sample(blureSampler, texCoord);
-#endif
-#ifdef COLORONLY
-	return diffuseColor.Sample(blureSampler, texCoord);
-#endif
-#ifdef LIGHTONLY
-	return lightmap.Sample(blureSampler, texCoord);
-#endif
-#ifdef OCCLUSIONONLY
-     x.xyz = occlusion.Sample(blureSampler, texCoord);
-#ifdef ALPHA
-    return float4(0,0,0,0);
-#endif
-	return float4(x.xxx,1.0);
-#endif
-#ifdef NORMALSONLY
-    x = normals.Sample(blureSampler, texCoord);
-    //x = mul(x, mainConstants.view);
-    x+= float4(1,1,1,1);
-    x/=2;
-#ifdef ALPHA
-    return float4(0,0,0,0);
-#endif
-	return x;
+#ifdef SINGLETEXTURE
+    float4 output = diffuseColor.Sample(blureSampler, texCoord);
+    
+    //if (output != abs(output))
+    //{
+    //    output += float4(1,1,1,1);
+    //    output/=2;
+    //}
+    return float4(output.xyz, 1); 
 #endif
     
-#ifdef ALPHAONLY
-#ifdef ALPHA
-    float4 alphaColor2 = alphaSurfaces.Sample(blureSampler, texCoord);
-    //alphaColor.w = 0.3;
-    return alphaColor2;
-#endif
-	return 0;
-#endif
+
 
 #ifdef ALPHA
 	float4 alphaColor = alphaSurfaces.Sample(blureSampler, texCoord);
-	float depth = depthTex.Sample(blureSampler, texCoord);
+	//float depth = depthTex.Sample(blureSampler, texCoord);
     alphaColor.w = 0.3;
 	return alphaColor;
 #endif

@@ -10,7 +10,7 @@ class GPUShader
 public:
     GPUShader(const ShaderDesc& desc, int id);
     ShaderDesc description;
-    IRenderDevice::IShader* shader = nullptr;
+    IRenderDevice::SHADERHANDLE shader = nullptr;
     int id = -1;
 };
 

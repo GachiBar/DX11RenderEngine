@@ -1,10 +1,15 @@
-﻿
+﻿#pragma once
 
 // graphics exception checking/throwing macros (some with dxgi infos)
 #define GFX_EXCEPT_NOINFO(hr) HrException(__LINE__,  __FILE__,  (hr))
 #define GFX_THROW_NOINFO(hrcall) if(FAILED(hr = (hrcall))) throw HrException(__LINE__,  __FILE__,  hr)
 
-#if _DEBUG
+
+#ifndef  TESTDEBUG 
+#define TESTDEBUG 1
+#endif
+
+#if _DEBUG | TESTDEBUG
 #define GFX_EXCEPT(hr) HrException(__LINE__,  __FILE__, (hr), infoManager.GetMessages())
 #define GFX_THROW_INFO(hrcall) infoManager.Set(); if(FAILED(hr = (hrcall))) throw GFX_EXCEPT(hr)
 #define GFX_DEVICE_REMOVED_EXCEPT(hr) DeviceRemovedException(__LINE__, __FILE__, (hr), infoManager.GetMessages())

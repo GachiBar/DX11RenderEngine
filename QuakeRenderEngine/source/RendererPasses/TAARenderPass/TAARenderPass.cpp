@@ -5,12 +5,20 @@
 #include "imgui/imgui.h"
 #include "ResourceManagers/States/Samplers.h"
 
+using namespace Renderer;
 
 TAARenderPass::TAARenderPass(BaseRenderSystem& System)
         : BaseRenderPass({"TAAShader.hlsl", System}), QuadHelper(System.pRenderer)
 {
 	Settings.numSamples = 10;
 	Settings.taaStrength = 1;
+	
+	uint32_t width, height;
+	renderDevice->GetMainViewportSize(width, height);
+	
+   //System.texturesManger->CreatePublicRenderTarget(
+   //	{"preAAcolor", Renderer::SURFACEFORMAT_VECTOR4, true, false, false, width, height}
+   //	);
 }
 
 void TAARenderPass::Init(const char* dirr)
@@ -63,6 +71,13 @@ void TAARenderPass::PreRender()
     localBuffer.numSamples = Settings.numSamples;
     baseRendererParams.renderSystem.viewConstants.taaBuffer.taaStrength = Settings.taaStrength;
     baseRendererParams.renderSystem.viewConstants.taaBuffer.taaPixelShift = HaltonSequence[HaltonIndex];
+
+	RenderTargetBinding* targets[] = {
+		baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("preAAcolor"))
+	};
+
+	renderDevice->SetRenderTargets(targets, std::size(targets), nullptr);
+	renderDevice->Clear(CLEAROPTIONS_TARGET, {}, 0, 0);
 }
 
 void TAARenderPass::Resize()
@@ -115,8 +130,8 @@ void TAARenderPass::Render()
 	renderDevice->SetRenderTargets(nullptr, 0, nullptr);
 	
 	renderDevice->VerifyPixelTexture(0, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("velocityField"		 ))->texture);
-	renderDevice->VerifyPixelTexture(1, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("diffuseColor"			 ))->texture);
-	//renderDevice->VerifyPixelTexture(1, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("preAAcolor"			 ))->texture);
+	//renderDevice->VerifyPixelTexture(1, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("diffuseColor"			 ))->texture);
+	renderDevice->VerifyPixelTexture(1, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("preAAcolor"			 ))->texture);
 	renderDevice->VerifyPixelTexture(2, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("pastColor"			 ))->texture);
 	renderDevice->VerifyPixelTexture(3, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("pastDepth"		     ))->texture);
 	renderDevice->VerifyPixelTexture(4, baseRendererParams.renderSystem.texturesManger->depthBuffer->texture					     );

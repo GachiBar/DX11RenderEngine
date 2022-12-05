@@ -166,7 +166,7 @@ void D3D11Renderer::Clear(ClearOptions options, FColor color, float depth, int32
     if (dsClearFlags != 0 && depthStencilBuffer != nullptr && depthStencilBuffer->texture != nullptr)
     {
         /* Clear! */
-        testApi->ClearDepthStencil(depthStencilBufferTest, depth, stencil);
+        testApi->ClearDepthStencil(depthStencilBuffer->depth.nDsView, depth, stencil);
     }
 }
 
@@ -615,7 +615,7 @@ void D3D11Renderer::SetRenderTargets(RenderTargetBinding** renderTargets, int32_
     if (numRenderTargets == 0)
     {
         nviews[0] = nullptr;
-        testApi->SetupRenderTargets(nviews, 1, 0, nullptr);
+        testApi->SetupRenderTargets(nviews, 0, 0, nullptr);
         testApi->SetupNumRenderTargets(1);
         return;
     }
@@ -1167,7 +1167,9 @@ PixelShader* D3D11Renderer::CompilePixelShader(const ShaderCompileData& shaderDa
 
     GVM::ShaderDesc desc;
     desc.type = GVM::EShaderType::PIXEL_SHADER;
+#ifdef _DEBUG
     desc.name = shaderData.name;
+#endif // _DEBUG
     desc.bytecode = result->data;
     desc.byteCodeSize = result->dataSize;
     result->testShader = testApi->CreateShader(desc);
@@ -1182,7 +1184,9 @@ ComputeShader* D3D11Renderer::CompileComputeShader(const ShaderCompileData& shad
 
     GVM::ShaderDesc desc;
     desc.type = GVM::EShaderType::COMPUTE_SHADER;
+#ifdef _DEBUG
     desc.name = shaderData.name;
+#endif // _DEBUG
     desc.bytecode = result->data;
     desc.byteCodeSize = result->dataSize;
     result->testShader = testApi->CreateShader(desc);
@@ -1196,7 +1200,10 @@ GeometryShader* D3D11Renderer::CompileGeometryShader(const ShaderCompileData& sh
 
     GVM::ShaderDesc desc;
     desc.type = GVM::EShaderType::GEOMETRY_SHADER;
+
+#ifdef _DEBUG
     desc.name = shaderData.name;
+#endif // _DEBUG
     desc.bytecode = result->data;
     desc.byteCodeSize = result->dataSize;
     result->testShader = testApi->CreateShader(desc);
@@ -1213,7 +1220,9 @@ VertexShader* D3D11Renderer::CompileVertexShader(const ShaderCompileData& shader
 
     GVM::ShaderDesc desc;
     desc.type = GVM::EShaderType::VERTEX_SHADER;
-    desc.name = shaderData.name;
+#ifdef _DEBUG
+        desc.name = shaderData.name;
+#endif // _DEBUG
     desc.bytecode = result->data;
     desc.byteCodeSize = result->dataSize;
     result->testShader = testApi->CreateShader(desc);

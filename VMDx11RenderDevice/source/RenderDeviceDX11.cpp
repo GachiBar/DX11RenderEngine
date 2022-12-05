@@ -37,10 +37,10 @@ RenderDeviceDX11::RenderDeviceDX11(const RenderDeviceInitParams& initParams, boo
 
     /* Create the D3D11Device */
     flags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-    if (debugMode)
-    {
+
+#if _DEBUG
         flags |= D3D11_CREATE_DEVICE_DEBUG;
-    }
+#endif
 
 
     DXGI_SWAP_CHAIN_DESC swapchainDesc;
@@ -156,6 +156,11 @@ RenderDeviceDX11::RenderDeviceDX11(const RenderDeviceInitParams& initParams, boo
         NULL,
         &swapchainRTView
     ));
+
+    
+    this->vertexBuffers.resize(32);
+    this->vertexBufferOffsets.resize(32);
+    this->vertexBufferStrides.resize(32);
 }
 
 RenderDeviceDX11::~RenderDeviceDX11()
@@ -336,7 +341,15 @@ IRenderDevice::IResource* RenderDeviceDX11::CreateResource(const GpuResource& Re
     return nullptr;
 }
 
-void RenderDeviceDX11::DestroyResource(IPlaceable* resource)
+void RenderDeviceDX11::DestroyResource(IResource* const resource)
+{
+    IUnknown* d3d11resource = reinterpret_cast<IUnknown*>(resource);
+    if (d3d11resource)
+        d3d11resource->Release();
+}
+
+
+void RenderDeviceDX11::DestroyResourceView(IResourceView* const resource)
 {
     IUnknown* d3d11resource = reinterpret_cast<IUnknown*>(resource);
     if (d3d11resource)
@@ -656,7 +669,7 @@ void RenderDeviceDX11::SetResourceData(const GpuResource& resource, uint16_t dst
     //SDL_LockMutex(renderer->ctxLock);
 }
 
-bool ToD3D11Viewports(const Compressed::ViewportDesc viewports[], D3D11_VIEWPORT d3d11viewports[8], uint8_t num)
+bool ToD3D11Viewports(const Compressed::ViewportDesc viewports[], D3D11_VIEWPORT d3d11viewports[20], uint8_t num)
 {
     bool result = false;
     for (int i = 0; i < num; i++)
@@ -666,15 +679,24 @@ bool ToD3D11Viewports(const Compressed::ViewportDesc viewports[], D3D11_VIEWPORT
             d3d11viewports[i] = ((D3D11_VIEWPORT*)viewports)[i];
             result = true;
         }
+        assert(-32768.000000 <= d3d11viewports[i].TopLeftX &&
+        -32768.000000 <= d3d11viewports[i].TopLeftY &&
+        -32768.000000 <= (d3d11viewports[i].TopLeftX+d3d11viewports[i].Width) &&
+        (d3d11viewports[i].TopLeftX+d3d11viewports[i].Width) <= 32767.000000 &&
+        (d3d11viewports[i].TopLeftY+d3d11viewports[i].Height) <= 32767.000000 &&
+        0.000000 <= d3d11viewports[i].MinDepth &&
+        d3d11viewports[i].MaxDepth <= 1.000000 &&
+         d3d11viewports[i].MinDepth <= d3d11viewports[i].MaxDepth
+        );
     }
-    return true;
+    return result;
 }
 
 void RenderDeviceDX11::SetupViewports(const Compressed::ViewportDesc viewports[], uint8_t num)
 {
-    static D3D11_VIEWPORT d3d11viewports[20];
-    if (ToD3D11Viewports(viewports, d3d11viewports, num))
+    if (ToD3D11Viewports(viewports, d3d11viewports, num) || num != d3d11viewportsNum)
     {
+        d3d11viewportsNum = num;
         GFX_THROW_INFO_ONLY(context->RSSetViewports(num, d3d11viewports));
     }
 }
@@ -732,7 +754,13 @@ void RenderDeviceDX11::SetupBlendState(const Compressed::CoreBlendDesc& blendSta
     };
 
     auto bs = FetchBlendState(blendState);
-    context->OMSetBlendState(bs, blendFactor.Color, blendState.desc.SampleMask);
+    if (bs!=blendStatePtr || blendFactor != blendFactorHash || blendState.desc.SampleMask != multiSampleMask)
+    {
+        blendStatePtr = bs;
+        multiSampleMask = blendState.desc.SampleMask;
+        blendFactorHash = blendFactor;
+        context->OMSetBlendState(bs, blendFactor.Color, blendState.desc.SampleMask);
+    }
 }
 
 D3D11_DEPTH_STENCIL_DESC ToDX11DSState(const Compressed::DepthStencilStateDesc& depthStencilState)
@@ -799,7 +827,11 @@ ID3D11DepthStencilState* RenderDeviceDX11::FetchDepthStencilState(const Compress
 void RenderDeviceDX11::SetupDepthStencilState(const Compressed::DepthStencilStateDesc& depthStencilState)
 {
     auto ds = FetchDepthStencilState(depthStencilState);
-    context->OMSetDepthStencilState(ds, 0);
+    if (ds != depthStencilStatePtr)
+    {
+        depthStencilStatePtr = ds;
+        context->OMSetDepthStencilState(depthStencilStatePtr, 0);
+    }
 }
 
 
@@ -847,7 +879,11 @@ ID3D11RasterizerState* RenderDeviceDX11::FetchRasterizerState(const Compressed::
 void RenderDeviceDX11::SetupRasterizerState(const Compressed::RasterizerStateDesc& rasterizerState)
 {
     auto rs = FetchRasterizerState(rasterizerState);
-    context->RSSetState(rs);
+    if (rs != rasterizerStatePtr)
+    {
+        rasterizerStatePtr = rs;
+        context->RSSetState(rasterizerStatePtr);
+    }
 }
 
 D3D11_FILTER ToD3D11SamplerFilter[] = {
@@ -916,17 +952,23 @@ ID3D11SamplerState* RenderDeviceDX11::FetchSamplerState(const Compressed::Sample
 
 void RenderDeviceDX11::SetupSamplers(const Compressed::SamplerStateDesc samplers[], uint8_t num)
 {
-    ID3D11SamplerState* Samplers[16] = {};
+    bool flag = samplersNum != num;
     for (int i = 0; i < num; i++)
     {
-        Samplers[i] = FetchSamplerState((samplers[i]));
+        auto sampler = FetchSamplerState((samplers[i]));
+        flag |= Samplers[i] != sampler;
+        Samplers[i] = sampler;
     }
-    if (CS) context->CSSetSamplers(0, num, Samplers);
-    if (PS) context->PSSetSamplers(0, num, Samplers);
-    if (GS) context->GSSetSamplers(0, num, Samplers);
-    if (DS) context->DSSetSamplers(0, num, Samplers);
-    if (HS) context->HSSetSamplers(0, num, Samplers);
-    if (VS) context->VSSetSamplers(0, num, Samplers);
+    if(flag)
+    {
+        samplersNum = num;
+        if (CS) context->CSSetSamplers(0, num, Samplers);
+        if (PS) context->PSSetSamplers(0, num, Samplers);
+        if (GS) context->GSSetSamplers(0, num, Samplers);
+        if (DS) context->DSSetSamplers(0, num, Samplers);
+        if (HS) context->HSSetSamplers(0, num, Samplers);
+        if (VS) context->VSSetSamplers(0, num, Samplers);
+    }
 }
 
 D3D11_PRIMITIVE_TOPOLOGY ToD3DPT[] = {
@@ -949,93 +991,120 @@ D3D11_PRIMITIVE_TOPOLOGY ToD3DPT[] = {
 
 void RenderDeviceDX11::SetupPrimitiveTopology(const EPrimitiveTopology topology)
 {
-    context->IASetPrimitiveTopology(ToD3DPT[to_underlying(topology)]);
+    if (topologyHash != topology)
+    {
+        topologyHash = topology;
+        context->IASetPrimitiveTopology(ToD3DPT[to_underlying(topology)]);
+    }
 }
 
-void RenderDeviceDX11::SetupVertexBuffer(const IVertexBufferView* vertexBuffers[], uint8_t num)
+void RenderDeviceDX11::SetupVertexBuffers(IVertexBufferView* const vertexBuffers[], uint8_t num)
 {
-    this->vertexBuffers.resize(32);
-    this->vertexBufferOffsets.resize(32);
-    this->vertexBufferStrides.resize(32);
+    bool flag = num != vertexBuffersNum; 
+    vertexBuffersNum = num;
     for (int i = 0; i < num; i++)
     {
         const VertexBufferViewD3D11* vb = reinterpret_cast<const VertexBufferViewD3D11*>(vertexBuffers[i]);
         if (vb != nullptr)
         {
+            flag |= this->vertexBuffers[i] !=  vb->vertexBuffer;
             this->vertexBuffers[i] = vb->vertexBuffer;
+            flag |= vertexBufferOffsets[i] != vb->Offset;
             vertexBufferOffsets[i] = vb->Offset;
+            flag |= vertexBufferStrides[i] != vb->Stride;
             vertexBufferStrides[i] = vb->Stride;
         }
         else
         {
+            flag |= this->vertexBuffers[i] !=  nullptr;
             this->vertexBuffers[i] = nullptr;
+            flag |= vertexBufferOffsets[i] !=  0;
             vertexBufferOffsets[i] = 0;
+            flag |= vertexBufferStrides[i] != 0;
             vertexBufferStrides[i] = 0;
         }
     }
-    context->IASetVertexBuffers(0, num, this->vertexBuffers.data(), vertexBufferStrides.data(), vertexBufferOffsets.data());
+    if (flag)
+        context->IASetVertexBuffers(0, num, this->vertexBuffers.data(), vertexBufferStrides.data(), vertexBufferOffsets.data());
 }
 
-void RenderDeviceDX11::SetupIndexBuffer(const IIndexBufferView* indices)
+void RenderDeviceDX11::SetupIndexBuffers(IIndexBufferView* const indices)
 {
-    const IndexBufferViewD3D11* indexBuffer = reinterpret_cast<const IndexBufferViewD3D11*>(indices);
-    if (indices == nullptr) {
-        GFX_THROW_INFO_ONLY(context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0));
-    }
-    else {
-        GFX_THROW_INFO_ONLY(context->IASetIndexBuffer(indexBuffer->indexBuffer, indexBuffer->format, 0));
+    IndexBufferViewD3D11* indexBuffer = (IndexBufferViewD3D11*)(indices);
+    if (indexBuffer != indexBufferPtr)
+    {
+        indexBufferPtr = indexBuffer;
+        if (indices == nullptr) {
+            GFX_THROW_INFO_ONLY(context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0));
+        }
+        else {
+            GFX_THROW_INFO_ONLY(context->IASetIndexBuffer(indexBuffer->indexBuffer, indexBuffer->format, 0));
+        }
     }
 }
 
 void RenderDeviceDX11::SetupTextures(IResourceView* textures[], uint8_t num)
 {
+    bool flag = num != texturesNum;
     if (textures == nullptr)
     {
-        static ID3D11ShaderResourceView* nulls[128];
-        if (CS) context->CSSetShaderResources(0, 128, nulls);
-        if (PS) context->PSSetShaderResources(0, 128, nulls);
-        if (GS) context->GSSetShaderResources(0, 128, nulls);
-        if (DS) context->DSSetShaderResources(0, 128, nulls);
-        if (HS) context->HSSetShaderResources(0, 128, nulls);
-        if (VS) context->VSSetShaderResources(0, 128, nulls);
-        return;
+        for (int i = 0; i < num; i++)
+        {
+            ID3D11ShaderResourceView* sh = nullptr;
+            flag |= Textures[i] != nullptr;
+            Textures[i] = sh;
+        }
+    }else
+    {
+        for (int i = 0; i < num; i++)
+        {
+            ID3D11ShaderResourceView* sh = (ID3D11ShaderResourceView*)(textures[i]);
+            flag |= Textures[i] != sh;
+            Textures[i] = sh;
+        }
     }
     
-    for (int i = 0; i < num; i++)
+    if (flag)
     {
-        ID3D11ShaderResourceView* sh = const_cast<ID3D11ShaderResourceView*>(reinterpret_cast<const ID3D11ShaderResourceView*>(textures[i]));
-        Textures[i] = sh;
+        if (CS) context->CSSetShaderResources(0, num, Textures.data());
+        if (PS) context->PSSetShaderResources(0, num, Textures.data());
+        if (GS) context->GSSetShaderResources(0, num, Textures.data());
+        if (DS) context->DSSetShaderResources(0, num, Textures.data());
+        if (HS) context->HSSetShaderResources(0, num, Textures.data());
+        if (VS) context->VSSetShaderResources(0, num, Textures.data());
     }
-    if (CS) context->CSSetShaderResources(0, num, Textures.data());
-    if (PS) context->PSSetShaderResources(0, num, Textures.data());
-    if (GS) context->GSSetShaderResources(0, num, Textures.data());
-    if (DS) context->DSSetShaderResources(0, num, Textures.data());
-    if (HS) context->HSSetShaderResources(0, num, Textures.data());
-    if (VS) context->VSSetShaderResources(0, num, Textures.data());
 }
 
-void RenderDeviceDX11::SetupRenderTargets(const IRenderTargetView* renderTargets[], int32_t num, IDepthStencilView* depthStencilBuffer)
+void RenderDeviceDX11::SetupRenderTargets(IRenderTargetView* const renderTargets[], int32_t num, IDepthStencilView* depthStencilBuffer)
 {
+    bool flag = num  != renderTargetsNum;
+    flag |= this->depthStencilBuffer != (ID3D11DepthStencilView*)depthStencilBuffer;
     this->depthStencilBuffer = (ID3D11DepthStencilView*)depthStencilBuffer;
     if (renderTargets == nullptr)
     {
         static ID3D11RenderTargetView* nulls[MAX_RENDERTARGET_ATTACHMENTS];
         context->OMSetRenderTargets(MAX_RENDERTARGET_ATTACHMENTS, nulls, this->depthStencilBuffer);
+        numRenderTargets = 0;
         return;
     }
     for (int i = 0; i < num; i++)
     {
-        renderTargetViews[i] = renderTargets[i] == nullptr ? swapchainRTView : ((ID3D11RenderTargetView*)renderTargets[i]);
+        auto rtView =  renderTargets[i] == nullptr ? swapchainRTView : ((ID3D11RenderTargetView*)renderTargets[i]);
+        flag |= renderTargetViews[i] != rtView;
+        renderTargetViews[i] = rtView;
     }
     for (int i = num; i < MAX_RENDERTARGET_ATTACHMENTS; i++)
     {
+        flag |= renderTargetViews[i] != nullptr;
         renderTargetViews[i] = nullptr;
     }
-
-    context->OMSetRenderTargets(MAX_RENDERTARGET_ATTACHMENTS, renderTargetViews.data(), this->depthStencilBuffer);
+    if (flag)
+    {
+        context->OMSetRenderTargets(MAX_RENDERTARGET_ATTACHMENTS, renderTargetViews.data(), this->depthStencilBuffer);
+    }
 }
 
-void RenderDeviceDX11::SetupUATargets(const IUATargetView* uaTargets[], uint8_t num)
+void RenderDeviceDX11::SetupUATargets(IUATargetView* uaTargets[], uint8_t num)
 {
     static UINT arr[8];
     if (uaTargets == nullptr)
@@ -1064,38 +1133,62 @@ void RenderDeviceDX11::SetupShader(IShader* shader, EShaderType type)
     {
     case EShaderType::COMPUTE_SHADER:
     {
-        context->CSSetShader((ID3D11ComputeShader*)shader, nullptr, 0);
-        CS = shader != nullptr;
+        if ((ID3D11ComputeShader*)shader != CSPtr)
+        {
+            CSPtr = (ID3D11ComputeShader*)shader;
+            context->CSSetShader((ID3D11ComputeShader*)shader, nullptr, 0);
+            CS = shader != nullptr;
+        }
         break;
     }
     case EShaderType::HULL_SHADER:
-    {
-        context->HSSetShader((ID3D11HullShader*)shader, nullptr, 0);
-        HS = shader != nullptr;
+        {
+        if ((ID3D11ComputeShader*)shader != HSPtr)
+        {
+            HSPtr = (ID3D11HullShader*)shader;
+            context->HSSetShader((ID3D11HullShader*)shader, nullptr, 0);
+            HS = shader != nullptr;
+        }
         break;
     }
     case EShaderType::PIXEL_SHADER:
     {
-        context->PSSetShader((ID3D11PixelShader*)shader, nullptr, 0);
-        PS = shader != nullptr;
+        if ((ID3D11ComputeShader*)shader != PSPtr)
+        {
+            PSPtr = (ID3D11ComputeShader*)shader;
+            context->PSSetShader((ID3D11PixelShader*)shader, nullptr, 0);
+            PS = shader != nullptr;
+        }
         break;
     }
     case EShaderType::DOMAIN_SHADER:
     {
-        context->DSSetShader((ID3D11DomainShader*)shader, nullptr, 0);
-        DS = shader != nullptr;
+        if ((ID3D11ComputeShader*)shader != DSPtr)
+        {
+            DSPtr = (ID3D11ComputeShader*)shader;
+            context->DSSetShader((ID3D11DomainShader*)shader, nullptr, 0);
+            DS = shader != nullptr;
+        }
         break;
     }
     case EShaderType::VERTEX_SHADER:
     {
-        context->VSSetShader((ID3D11VertexShader*)shader, nullptr, 0);
-        VS = shader != nullptr;
+        if ((ID3D11ComputeShader*)shader != VSPtr)
+        {
+            VSPtr = (ID3D11ComputeShader*)shader;
+            context->VSSetShader((ID3D11VertexShader*)shader, nullptr, 0);
+            VS = shader != nullptr;
+        }
         break;
     }
     case EShaderType::GEOMETRY_SHADER:
     {
-        context->GSSetShader((ID3D11GeometryShader*)shader, nullptr, 0);
-        GS = shader != nullptr;
+        if ((ID3D11ComputeShader*)shader != GSPtr)
+        {
+            GSPtr = (ID3D11ComputeShader*)shader;
+            context->GSSetShader((ID3D11GeometryShader*)shader, nullptr, 0);
+            GS = shader != nullptr;
+        }
         break;
     }
     }
@@ -1103,26 +1196,79 @@ void RenderDeviceDX11::SetupShader(IShader* shader, EShaderType type)
 
 void RenderDeviceDX11::SetupConstBuffers(IConstBufferView* constBuffers[], uint8_t num)
 {
-    static ID3D11Buffer* buffers[32];
+    bool flag = num != constBuffersNum;
     for (int i = 0; i < num; i++)
     {
-        buffers[i] = ((ConstBufferViewD3D11**)constBuffers)[i] ? ((ConstBufferViewD3D11**)constBuffers)[i]->constBuffer : nullptr;
+        ID3D11Buffer* buffer = ((ConstBufferViewD3D11**)constBuffers)[i] ? ((ConstBufferViewD3D11**)constBuffers)[i]->constBuffer : nullptr;
+        flag |= buffer != constBuffersPtr[i] ;
+        constBuffersPtr[i] = buffer;
     }
     for (int i = num; i < 32; i++)
     {
-        buffers[i] = nullptr;
+        flag |= nullptr != constBuffersPtr[i] ;
+        constBuffersPtr[i] = nullptr;
     }
-    if (CS) context->CSSetConstantBuffers(0, num, buffers);
-    if (PS) context->PSSetConstantBuffers(0, num, buffers);
-    if (GS) context->GSSetConstantBuffers(0, num, buffers);
-    if (DS) context->DSSetConstantBuffers(0, num, buffers);
-    if (HS) context->HSSetConstantBuffers(0, num, buffers);
-    if (VS) context->VSSetConstantBuffers(0, num, buffers);
+    if (flag)
+    {
+        if (CS) context->CSSetConstantBuffers(0, num, constBuffersPtr);
+        if (PS) context->PSSetConstantBuffers(0, num, constBuffersPtr);
+        if (GS) context->GSSetConstantBuffers(0, num, constBuffersPtr);
+        if (DS) context->DSSetConstantBuffers(0, num, constBuffersPtr);
+        if (HS) context->HSSetConstantBuffers(0, num, constBuffersPtr);
+        if (VS) context->VSSetConstantBuffers(0, num, constBuffersPtr);
+    }
 }
 void RenderDeviceDX11::SetupInputLayout(IInputLayout* layout)
 {
-    context->IASetInputLayout((ID3D11InputLayout*)layout);
+    if (layoutPtr != layout)
+    {
+        layoutPtr = layout;
+        context->IASetInputLayout((ID3D11InputLayout*)layout);
+    }
 }
+
+void RenderDeviceDX11::SetupPipeline(const PipelineDescription& Pipeline)
+{
+    if (Pipeline.isCS)
+    {
+        SetupShader(Pipeline.CS, EShaderType::COMPUTE_SHADER);
+
+        HS = false;
+        PS = false;
+        DS = false;
+        VS = false;
+        GS = false;
+        HSPtr = nullptr;
+        PSPtr = nullptr;
+        DSPtr = nullptr;
+        VSPtr = nullptr;
+        GSPtr = nullptr;
+
+        SetupSamplers(Pipeline.samplers, Pipeline.samplersNum);
+
+        
+    }
+    else
+    {
+        CS    = false;
+        CSPtr = nullptr;
+        SetupShader(Pipeline.HS, EShaderType::HULL_SHADER);
+        SetupShader(Pipeline.PS, EShaderType::PIXEL_SHADER);
+        SetupShader(Pipeline.DS, EShaderType::DOMAIN_SHADER);
+        SetupShader(Pipeline.VS, EShaderType::VERTEX_SHADER);
+        SetupShader(Pipeline.GS, EShaderType::GEOMETRY_SHADER);
+        SetupInputLayout(Pipeline.layout);
+        
+        SetupViewports(Pipeline.viewports, Pipeline.viewportsNum);
+        SetupSamplers(Pipeline.samplers, Pipeline.samplersNum);
+        SetupBlendState(Pipeline.blendState);
+        SetupDepthStencilState(Pipeline.depthStencilState);
+        SetupRasterizerState(Pipeline.rasterizerState);
+        SetupPrimitiveTopology(Pipeline.topology);
+        
+    }
+}
+
 void RenderDeviceDX11::ClearState()
 {
     context->ClearState();
@@ -1131,14 +1277,36 @@ void RenderDeviceDX11::ClearState()
     GS = false; 
     DS = false; 
     HS = false; 
-    VS = false; 
+    VS = false;
+    CSPtr = nullptr;
+    PSPtr = nullptr;
+    VSPtr = nullptr;
+    GSPtr = nullptr;
+    HSPtr = nullptr;
+    DSPtr = nullptr;
+
+
+    blendStatePtr = nullptr;;
+    blendFactorHash = {};
+    depthStencilStatePtr = nullptr;;
+    rasterizerStatePtr = nullptr;
+    samplersNum = 0;
+    d3d11viewportsNum = 0;
+    topologyHash =  EPrimitiveTopology::PRIMITIVE_TOPOLOGY_UNKNOWN;
+
+    vertexBuffersNum = 0;
+    renderTargetsNum = 0;
+    constBuffersNum = 0;
+    texturesNum = 0;
+    indexBufferPtr = nullptr;
+    
 }
-void RenderDeviceDX11::ClearRenderTarget(const IRenderTargetView* rtView, FColor color)
+void RenderDeviceDX11::ClearRenderTarget(IRenderTargetView* rtView, FColor color)
 {
     context->ClearRenderTargetView((ID3D11RenderTargetView*)rtView ? (ID3D11RenderTargetView*)rtView : swapchainRTView, color.Color);
 }
 
-void RenderDeviceDX11::ClearDepthStencil(const IDepthStencilView* dsView, float depth, int8_t stencil)
+void RenderDeviceDX11::ClearDepthStencil(IDepthStencilView* dsView, float depth, int8_t stencil)
 {
     context->ClearDepthStencilView((ID3D11DepthStencilView*)dsView, D3D11_CLEAR_DEPTH, depth, stencil);
 }
@@ -1186,10 +1354,11 @@ void RenderDeviceDX11::EndEvent()
     perf->EndEvent();
 }
 
-void* RenderDeviceDX11::GetNativeTexture(const IResourceView* view)
+void* RenderDeviceDX11::GetNativeTexture(IResourceView* view)
 {
     return (void*)view;
 }
+
 void RenderDeviceDX11::GetBackbufferSize(uint32_t& w, uint32_t& h)
 {
     w = backBufferWidth;
@@ -1197,7 +1366,9 @@ void RenderDeviceDX11::GetBackbufferSize(uint32_t& w, uint32_t& h)
 }
 void RenderDeviceDX11::SyncBlockExecutionStart() {}
 void RenderDeviceDX11::SyncResourcesRead(IResource** data, size_t size) {}
-void RenderDeviceDX11::SyncResourcesWrite(IResource** data, size_t size) {}
+void RenderDeviceDX11::SyncResourcesWrite(IResource** data, size_t size)
+{
+}
 void RenderDeviceDX11::SyncBlockExecutionEnd() {}
 
 void RenderDeviceDX11::Draw(const DrawCall& call)
