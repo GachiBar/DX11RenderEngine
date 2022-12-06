@@ -59,6 +59,9 @@ PS_IN vsIn(
 
 
 
+#define AmbientLight 1
+
+
 struct PSOutput
 {
 	float4 Accumulator : SV_Target0;
@@ -76,7 +79,7 @@ TextureCube PreFiltEnvMap : register(t5);
 TextureCube ConMap : register(t6);
 Texture2D IntegratedMap : register(t7);
 
-Texture2D ShadowMap : register(t4);
+//Texture2D ShadowMap : register(t4);
 
 
 struct GBufferData
@@ -87,6 +90,9 @@ struct GBufferData
 	float3 Emissive;
 	float3 WorldPos;
 };
+
+
+static const float PI = 3.141592;
 
 
 GBufferData ReadGBuffer(float2 screenPos)
@@ -102,11 +108,99 @@ GBufferData ReadGBuffer(float2 screenPos)
 	return buf;
 }
 
+static const float Epsilon = 0.00001;
+
+// Constant normal incidence Fresnel factor for all dielectrics.
+static const float3 Fdielectric = 0.04;
+
+// Shlick's approximation of the Fresnel factor.
+float3 fresnelSchlick(float3 F0, float cosTheta)
+{
+	return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+float ndfGGX(float cosLh, float roughness)
+{
+	float alpha   = roughness * roughness;
+	float alphaSq = alpha * alpha;
+
+	float denom = (cosLh * cosLh) * (alphaSq - 1.0) + 1.0;
+	return alphaSq / (PI * denom * denom);
+}
+
+// Single term for separable Schlick-GGX below.
+float gaSchlickG1(float cosTheta, float k)
+{
+	return cosTheta / (cosTheta * (1.0 - k) + k);
+}
+
+// Schlick-GGX approximation of geometric attenuation function using Smith's method.
+float gaSchlickGGX(float cosLi, float cosLo, float roughness)
+{
+	float r = roughness + 1.0;
+	float k = (r * r) / 8.0; // Epic suggests using this roughness remapping for analytic lights.
+	return gaSchlickG1(cosLi, k) * gaSchlickG1(cosLo, k);
+}
+
+
+float4 CalculateLightSimple(GBufferData buf, float4 ViewerPos)
+{
+	float3 albedo   = buf.Diffuse.xyz;
+	float metalness = buf.MetRougAo.x;
+	float roughness = buf.MetRougAo.y;
+
+	// Outgoing light direction (vector from world-space fragment position to the "eye").
+	float3 Lo = normalize(coreConstants.viewPosition.xyz - buf.WorldPos).xyz;
+
+	// Get current fragment's normal and transform to world space.
+	float3 N = buf.Normal;
+	//N = normalize(mul(pin.tangentBasis, N));
+	
+	// Angle between surface normal and outgoing light direction.
+	float cosLo = max(0.0, dot(N, Lo));
+		
+	// Specular reflection vector.
+	float3 Lr = 2.0 * cosLo * N - Lo;
+
+	// Fresnel reflectance at normal incidence (for metals use albedo color).
+	float3 F0 = lerp(Fdielectric, albedo, metalness);
+
+	// Direct lighting calculation for analytical lights.
+	float3 directLighting = 0.0;
+	
+	float3 Li = lightCosntBuffer.Light.Dir.xyz;
+	float3 Lradiance = lightCosntBuffer.Light.Params.x*lightCosntBuffer.Light.Color;
+	// Half-vector between Li and Lo.
+	float3 Lh = normalize(Li + Lo);
+	// Calculate angles between surface normal and various light vectors.
+	float cosLi = max(0.0, dot(N, Li));
+	float cosLh = max(0.0, dot(N, Lh));
+	// Calculate Fresnel term for direct lighting. 
+	float3 F  = fresnelSchlick(F0, max(0.0, dot(Lh, Lo)));
+	// Calculate normal distribution for specular BRDF.
+	float D = ndfGGX(cosLh, roughness);
+	// Calculate geometric attenuation for specular BRDF.
+	float G = gaSchlickGGX(cosLi, cosLo, roughness);
+	// Diffuse scattering happens due to light being refracted multiple times by a dielectric medium.
+	// Metals on the other hand either reflect or absorb energy, so diffuse contribution is always zero.
+	// To be energy conserving we must scale diffuse BRDF contribution based on Fresnel factor & metalness.
+	float3 kd = lerp(float3(1, 1, 1) - F, float3(0, 0, 0), metalness);
+	// Lambert diffuse BRDF.
+	// We don't scale by 1/PI for lighting & material units to be more convenient.
+	// See: https://seblagarde.wordpress.com/2012/01/08/pi-or-not-to-pi-in-game-lighting-equation/
+	float3 diffuseBRDF = kd * albedo;
+	// Cook-Torrance specular microfacet BRDF.
+	float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
+	// Total contribution for this light.
+	return  float4((diffuseBRDF + specularBRDF) * Lradiance * cosLi,1);
+	
+}
+
 float4 CalculateLight(GBufferData buf, float4 ViewerPos)
 {
 	float4 color = float4(0, 0, 0, 0);
 #ifdef AmbientLight
-	color = float4(buf.Diffuse.rgb * Light.Params.x * Light.Color.rgb, 1.0f);
+	color = float4(buf.Diffuse.rgb * lightCosntBuffer.Light.Params.x * lightCosntBuffer.Light.Color.rgb, 1.0f);
 #elif DirectionalLight
 	float3 viewDir	= normalize(ViewerPos.xyz - buf.WorldPos);
 	float3 lightDir = normalize(lightCosntBuffer.Light.Dir.xyz);
@@ -121,7 +215,7 @@ float4 CalculateLight(GBufferData buf, float4 ViewerPos)
 
 	color = float4(lightCosntBuffer.Light.Color.rgb * (diffuse + spec) * lightCosntBuffer.Light.Params.x, 1.0f);
 #else
-	float3 lightRadVec = lightCosntBuffer.Light.Pos.xyz - buf.WorldPos;
+	float3 lightRadVec = Light.Pos.xyz - buf.WorldPos;
 	float distanceToLight = length(lightRadVec);
 
 	float3 viewDir = normalize(ViewerPos.xyz - buf.WorldPos);
@@ -241,17 +335,18 @@ float3 fresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 }
 
 
-
 PSOutput psIn(PS_IN input)
 {
 	PSOutput ret = (PSOutput) 0;
 
 	GBufferData buf = ReadGBuffer(input.pos.xy);
-
+	
 	clip(length(buf.Normal) - 0.001f);
 
 #ifdef DirectionalLight
 	float3 L = normalize(lightCosntBuffer.Light.Pos.xyz);
+	ret.Accumulator = CalculateLightSimple(buf, coreConstants.viewPosition);
+	return ret;
 #else
 	float3 L = normalize(lightCosntBuffer.Light.Pos.xyz - buf.WorldPos);
 #endif
@@ -277,18 +372,18 @@ PSOutput psIn(PS_IN input)
 	float3 kSa = Fa;
 	float3 kDa = float3(1.0f, 1.0f, 1.0f) - kSa;
 	kDa *= 1.0 - metallic;
-	float3 irradiance = ConMap.Sample(Sampler, N).rgb;
+	float3 irradiance = lightCosntBuffer.Light.Color.rgb;
 	float3 diffusea = irradiance * albedo;
 
 
 	// sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part.
-	const float MAX_REFLECTION_LOD = 4.0;
-	float3 prefilteredColor = PreFiltEnvMap.SampleLevel(Sampler, R, roughness * MAX_REFLECTION_LOD).rgb;
-	float2 brdf = IntegratedMap.Sample(SamplerClamp, float2(NdotV, roughness)).rg;
-	float3 speculara = prefilteredColor * (Fa * brdf.x + brdf.yyy);
+	//const float MAX_REFLECTION_LOD = 4.0;
+	//float3 prefilteredColor = PreFiltEnvMap.SampleLevel(Sampler, R, roughness * MAX_REFLECTION_LOD).rgb;
+	//float2 brdf = IntegratedMap.Sample(SamplerClamp, float2(NdotV, roughness)).rg;
+	float3 speculara = float3(0,0,0);
 
 
-	float3 ambient = (kDa * diffusea * Light.Params.x + speculara * Light.Params.y) * ao;
+	float3 ambient = (kDa * diffusea * lightCosntBuffer.Light.Params.x + speculara * lightCosntBuffer.Light.Params.y) * ao;
 
 	ret.Accumulator = float4(ambient, 1.0f);
 	ret.Bloom = float4(1.0f, 1.0f, 1.0f, 1.0f);

@@ -9,6 +9,7 @@ struct DiffuseData {
     bool isTextured = false;
     DiffuseData():isTextured(false) {};
     DiffuseData(TextureData::Color color):isTextured(false), color(color) {};
+    DiffuseData(uint64_t color):isTextured(true), textureId(color) {};
     DiffuseData(const DiffuseData& data):
     isTextured(data.isTextured),
     dummy1(data.dummy1),

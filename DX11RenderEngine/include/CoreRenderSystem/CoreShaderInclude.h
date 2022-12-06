@@ -56,6 +56,7 @@ struct CoreConstants {
     ViewProjectionMatrices currentMatrices;
     ViewProjectionMatrices pastMatrices;
 
+	float4 viewPosition;
 
     struct {
         float2 taaPixelShift;
@@ -64,7 +65,6 @@ struct CoreConstants {
 
     float time;
     float dt;
-	float4 viewPosition;
 };
 
 #ifndef HLSL

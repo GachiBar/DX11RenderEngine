@@ -50,6 +50,7 @@ PS_IN vsIn(VS_IN input)
 	
 	float4 worldPos = mul(float4(input.pos, 1.0f), opaqueCosntBuffer.world);
 	output.pos = mul(worldPos, coreConstants.currentMatrices.viewProjection);
+	output.pos = output.pos/ output.pos.w;
 	output.worldPos = worldPos.xyz/worldPos.w;
     
 	output.normal	= normalize(mul(float4(input.normal.xyz, 0.0f),   opaqueCosntBuffer.world)).xyz;
@@ -174,7 +175,7 @@ PSOutput psIn(PS_IN input)
 #endif
 
 	unpackedNormal = mul(unpackedNormal, TBN);
-	ret.Normal = float4(unpackedNormal, 0);
+	ret.Normal = float4(N,1);
 	
 	ret.MetRougAo = float4(metallic * opaqueCosntBuffer.MetallicMult, roughness * opaqueCosntBuffer.RoughnessMult, 1.0f, 1.0f);
 

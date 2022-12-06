@@ -164,7 +164,7 @@ void LightRenderPass::Render()
         if (light.LightType == LightTypes::Ambient || light.LightType == LightTypes::Directional)
         {
             renderDevice->ApplyRasterizerState(RasterizerStates::ClockWise);
-            renderDevice->SetDepthStencilState(DepthStencilStates::DSS);
+            renderDevice->SetDepthStencilState(DepthStencilStates::NoDSS);
 
             //context->VSSetShader(LightingVSs[VertexFlagsLighting::SCREEN_QUAD], nullptr, 0);
             //context->PSSetShader(LightingPSs[light->GetLightFlags()], nullptr, 0);
