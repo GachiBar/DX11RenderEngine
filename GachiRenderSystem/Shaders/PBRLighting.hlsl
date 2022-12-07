@@ -169,7 +169,7 @@ float4 CalculateLightSimple(GBufferData buf, float4 ViewerPos)
 	float3 directLighting = 0.0;
 	
 	float3 Li = lightCosntBuffer.Light.Dir.xyz;
-	float3 Lradiance = lightCosntBuffer.Light.Params.x*lightCosntBuffer.Light.Color;
+	float3 Lradiance = lightCosntBuffer.Light.Params.x * lightCosntBuffer.Light.Color.xyz;
 	// Half-vector between Li and Lo.
 	float3 Lh = normalize(Li + Lo);
 	// Calculate angles between surface normal and various light vectors.
@@ -192,7 +192,7 @@ float4 CalculateLightSimple(GBufferData buf, float4 ViewerPos)
 	// Cook-Torrance specular microfacet BRDF.
 	float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
 	// Total contribution for this light.
-	return  float4((diffuseBRDF + specularBRDF) * Lradiance * cosLi,1);
+	return  float4((diffuseBRDF + specularBRDF) * Lradiance/255 * cosLi,1);
 	
 }
 
