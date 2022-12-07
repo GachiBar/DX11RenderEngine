@@ -18,7 +18,13 @@ struct UIDrawData {
 };
 
 union ModelsFlags{
-    ModelsFlags() {isVisible = 1;}
+    ModelsFlags() 
+    {
+        isRed = 0;
+        isVisible = 1;
+        isColored = 0;
+        isWireframe = 0;
+    }
     uint32_t flags;
     struct {
         uint8_t isRed : 1 ;  
