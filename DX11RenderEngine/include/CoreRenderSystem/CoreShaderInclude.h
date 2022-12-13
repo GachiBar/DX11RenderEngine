@@ -13,6 +13,8 @@ struct TEXTURE_HANDLE {
 	TEXTURE_HANDLE(int slot) { this->slot = slot; }
 	int slot;
 };
+
+#define row_major 
 #else
 
 #ifdef GACHI
@@ -45,7 +47,7 @@ struct ViewProjectionMatrices {
 	matrix projection;
 	matrix inverseView;
 	matrix inverseProjection;
-	matrix viewProjection;
+	row_major matrix viewProjection;
 	matrix viewProjectionInverse;
 	matrix reprojectionMatrix;
 };

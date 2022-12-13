@@ -64,9 +64,11 @@ struct RenderDevice {
 	void RegisterTexture(size_t id, LPCWCH file);
 #endif
 	void RegisterTexture(size_t id, const char* file);
+
 	void RegisterTexture(size_t id, const TextureData&);
 	void RegisterTexture(size_t id, const FloatData&);
 	void RegisterTexture(size_t id, const Float3Data&);
+	
 	void RegisterTexture(size_t id, int width, int height, void* data);
 	void UpdateTexture(size_t id, const TextureData&);
 	void UpdateTexture(const ImageUpdate &);

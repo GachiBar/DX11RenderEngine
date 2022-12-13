@@ -40,7 +40,7 @@ void BaseRenderSystem::SetRenderData(const RenderData& data){
 	currentMatrices.inverseProjection = data.projection.Invert().Transpose();
 
 	matrix viewProjection = data.view * data.projection;
-	currentMatrices.viewProjection = viewProjection.Transpose();
+	currentMatrices.viewProjection = viewProjection;//.Transpose();
 	currentMatrices.viewProjectionInverse = viewProjection.Invert().Transpose();
 	
 	
