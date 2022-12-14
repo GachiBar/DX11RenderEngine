@@ -38,7 +38,7 @@ public:
 	
 	const CoreConstants& GetViewConstants() {return viewConstants;};
 	
-	virtual bool Present();
+	void Setup();
 	
 	void SetRenderData(const RenderData& data);
 	

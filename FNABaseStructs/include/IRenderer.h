@@ -55,6 +55,7 @@ namespace Renderer
 
         /* Presents the backbuffer to the window. */
         virtual void RunVM() = 0;
+        virtual void SetBB() = 0;
         virtual void SwapBuffers() = 0;
 
         /* Drawing */

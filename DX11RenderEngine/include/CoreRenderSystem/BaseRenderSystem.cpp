@@ -16,11 +16,10 @@ pRenderer(init.pRenderer), texturesManger(init.texturesManger), modelsManager(in
 }
 
 
-bool BaseRenderSystem::Present()
+void BaseRenderSystem::Setup()
 {
 	pRenderer->SetConstBuffer(pLocalConstants, &viewConstants);
 	pRenderer->VerifyConstBuffer(pLocalConstants, coreConstants.slot);
-	return true;
 }
 
 void BaseRenderSystem::SetRenderData(const RenderData& data){

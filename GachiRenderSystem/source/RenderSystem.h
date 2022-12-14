@@ -39,8 +39,13 @@ public:
 
 
 	void BeginFrame();
-	bool RenderFrame();
-	void EndFrame();
+	bool EndFrame();
+	
+	static void LambdaCallback(const ImDrawList* parent_list, const ImDrawCmd* cmd);
+
+
+	
+	void Present();
 	void ClearBuffer(sm::Vector4 color) noexcept;
 	void PostRender();
 

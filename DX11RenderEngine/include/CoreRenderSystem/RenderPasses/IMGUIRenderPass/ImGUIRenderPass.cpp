@@ -24,7 +24,6 @@ void ImGUIRenderPass::PostRender()
 {
 
 	static bool show = true;
-	show = true;
 	//ImGui::ShowDemoWindow(&show);
 	
 	ImGuiIO& io = ImGui::GetIO();

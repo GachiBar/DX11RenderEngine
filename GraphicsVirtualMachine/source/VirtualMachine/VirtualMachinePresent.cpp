@@ -486,9 +486,6 @@ void VirtualMachine::RunVM()
         std::cout << std::flush;
     }
 
-    static IRenderDevice::RENDERTARGETVIEWHANDLE renderTargets[1] = {nullptr};
-    RenderDevice->SetupRenderTargets((const IRenderDevice::RENDERTARGETVIEWHANDLE*)renderTargets, 1, nullptr);
-
     renderGraph.Clear();
     queueShift = 0;
     pipelinesQueueShift = 0;
@@ -497,6 +494,12 @@ void VirtualMachine::RunVM()
     commandQueue.clear();
     dataQueue.clear();
     drawCallsQueue.clear();
+}
+
+void VirtualMachine::SetBB()
+{
+    static IRenderDevice::RENDERTARGETVIEWHANDLE renderTargets[1] = {nullptr};
+    RenderDevice->SetupRenderTargets((const IRenderDevice::RENDERTARGETVIEWHANDLE*)renderTargets, 1, nullptr);
 }
 
 

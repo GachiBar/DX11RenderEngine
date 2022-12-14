@@ -8,6 +8,7 @@
 #include <filesystem>
 #include "imgui/imgui_impl_dx11.h"
 #include "imgui/imgui_impl_win32.h"
+#include "imgui/imgui_internal.h"
 
 #pragma comment(lib,"d3d11.lib")
 #pragma comment(lib,"D3DCompiler.lib")
@@ -192,44 +193,19 @@ void RenderSystem::BeginFrame()
 #define GFX_CATCH_RENDER(render) try {render;} catch (const std::exception& exe) {printf_s(exe.what()); printf_s("\n"); static char c[100]; scanf_s("%s", c,1); success = false; }
 //#define GFX_CATCH_RENDER(render) {render}
 
-bool RenderSystem::RenderFrame()
+bool RenderSystem::EndFrame()
 {
-
-    
-//#if _DEBUG
-//    renderPassDebug.Draw(
-//        DebugDraw3DData
-//        {
-//            {
-//                EPrimitiveType::PRIMITIVETYPE_LINESTRIP,
-//                4,
-//                {
-//                    DebugVertex3D{{0, 0, -10}},
-//                    DebugVertex3D{{3, 0, -10}},
-//                    DebugVertex3D{{6, 0, -10}},
-//                    DebugVertex3D{{20, 40, -10}},
-//                    DebugVertex3D{{100, 100, -10}}
-//                },
-//                {(uint32_t)0, (uint32_t)1, (uint32_t)2, (uint32_t)3, (uint32_t)4},
-//            },
-//            Transform(),
-//            float3(0, 1, 0),
-//            {}
-//        }
-//    );
-//
-//#endif
 
 
     pRenderer->ClearState();
-    BaseRenderSystem::Present();
+    BaseRenderSystem::Setup();
 
     //re.UpdateHaltonSequence();
 
     //pRenderer->SetConstBuffer(pLocalConstants, &taaConstants);
     // pRenderer->VerifyConstBuffer(pLocalConstants, taaShiftBuffer.slot);
 
-    BaseRenderSystem::Present();
+    BaseRenderSystem::Setup();
 
     bool success = true;
     pRenderer->BeginEvent("BSP draw.");
@@ -291,7 +267,7 @@ bool RenderSystem::RenderFrame()
     renderPassUI.Render();
     pRenderer->EndEvent();
 
-    BaseRenderSystem::Present();
+    BaseRenderSystem::Setup();
 #if _DEBUG
     pRenderer->BeginEvent("Debug draw.");
     GFX_CATCH_RENDER(renderPassDebug.Render());
@@ -302,19 +278,27 @@ bool RenderSystem::RenderFrame()
     renderPassIMGUI.Render();
     pRenderer->EndEvent();
 
-    pRenderer->ClearState();
-    
 
     GFX_CATCH_RENDER(pRenderer->RunVM());
-
     
+    GFX_CATCH_RENDER(pRenderer->SetBB());
+
+    if (!success)
+        PostRender();
     return success;
 }
 
-void RenderSystem::EndFrame()
+void RenderSystem::LambdaCallback(const ImDrawList* parent_list, const ImDrawCmd* cmd)
+{
+    
+    bool success = true;
+    auto pRenderer = (IRenderer*)cmd->UserCallbackData;
+    GFX_CATCH_RENDER(pRenderer->SetBB());
+}
+
+void RenderSystem::Present()
 {
     PostRender();
-
     pRenderer->SwapBuffers();
 }
 

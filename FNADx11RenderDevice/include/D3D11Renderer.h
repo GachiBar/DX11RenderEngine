@@ -25,7 +25,7 @@ namespace Renderer{
 struct D3D11Texture;
 
 
-class D3D11Renderer : public IRenderer {
+class  D3D11Renderer final:  public IRenderer {
 public:
 	/* Persistent D3D11 Objects */
 	GVM::GraphicsApi* testApi;
@@ -105,6 +105,7 @@ public:
 	// Унаследовано через IRenderer
 	virtual void GetDrawableSize(void* window, int32_t* w, int32_t* h) override;
 	virtual void RunVM() override;
+	virtual void SetBB() override;
 	virtual void SwapBuffers() override;
 	virtual void Clear(ClearOptions options, FColor color, float depth, int32_t stencil) override;
 

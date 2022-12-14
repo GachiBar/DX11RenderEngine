@@ -26,21 +26,21 @@ void RenderDevice::ReloadShaders()
 }
 
 
-void RenderDevice::BeginFrame() {
-	gfx->BeginFrame();
-}
-
 void RenderDevice::SetRenderData(const RenderData& data){
 	gfx->SetRenderData(data);
 }
 
-bool RenderDevice::Present() {
-	return gfx->RenderFrame();
+void RenderDevice::BeginFrame() {
+	gfx->BeginFrame();
 }
 
-void RenderDevice::EndFrame()
+bool RenderDevice::EndFrame()
 {
-	gfx->EndFrame();
+	return gfx->EndFrame();
+}
+
+void RenderDevice::Present() {
+	gfx->Present();
 }
 
 void RenderDevice::SetSky(size_t side, const TextureData& data) {

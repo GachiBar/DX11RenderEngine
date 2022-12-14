@@ -133,6 +133,10 @@ void D3D11Renderer::RunVM()
 {
     testApi->RunVM();
 }
+void D3D11Renderer::SetBB()
+{
+    testApi->SetBB();
+}
 
 void D3D11Renderer::SwapBuffers()
 {

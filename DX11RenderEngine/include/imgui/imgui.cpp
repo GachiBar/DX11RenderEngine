@@ -5371,6 +5371,16 @@ void ImGui::Render()
     ImGuiContext& g = *GImGui;
     IM_ASSERT(g.Initialized);
 
+    //for (int n = 0; n != g.Windows.Size; n++)
+    //{
+    //    ImGuiWindow* window = g.Windows[n];
+    //    IM_MSVC_WARNING_SUPPRESS(6011);
+    //    auto id = ImHashStr(name)
+    //    if (window->n)
+    //        FindWindowByName("")
+    //    
+    //}
+
     if (g.FrameCountEnded != g.FrameCount)
         EndFrame();
     const bool first_render_of_frame = (g.FrameCountRendered != g.FrameCount);

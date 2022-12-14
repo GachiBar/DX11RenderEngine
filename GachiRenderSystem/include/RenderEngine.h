@@ -53,10 +53,13 @@ struct RenderDevice {
 	/* Presentation */
 
 
-	void BeginFrame();
 	void SetRenderData(const RenderData& data);
-	bool Present();
-	void EndFrame();
+	
+	void BeginFrame();
+	bool EndFrame();
+	
+	void Present();
+	
 	void Clear(float r, float g, float b);
 
 	/* Resourse loading*/

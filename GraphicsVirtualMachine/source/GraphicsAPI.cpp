@@ -22,6 +22,11 @@ void GraphicsApi::RunVM()
     graphicsMachine->RunVM();
 }
 
+void GraphicsApi::SetBB()
+{
+    graphicsMachine->SetBB();
+}
+
 void GraphicsApi::Present()
 {
     graphicsMachine->Present();

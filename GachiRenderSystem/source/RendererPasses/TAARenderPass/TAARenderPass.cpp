@@ -83,7 +83,7 @@ void TAARenderPass::Render()
 	uint32_t width, height;
 	renderDevice->GetMainViewportSize(width, height);
 	renderDevice->ClearState();
-	baseRendererParams.renderSystem.Present();
+	baseRendererParams.renderSystem.Setup();
 	
 
 	size_t flags = TAAZERO;
