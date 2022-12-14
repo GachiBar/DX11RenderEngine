@@ -139,6 +139,16 @@ bool RenderDevice::WasIdUsed(size_t id)
 	return gfx->WasIdUsed(id);
 }
 
+bool RenderDevice::IsTextureIdUsed(size_t id)
+{
+	return gfx->IsTextureIdUsed(id);
+}
+
+bool RenderDevice::IsMeshIdUsed(size_t id)
+{
+	return gfx->IsMeshIdUsed(id);
+}
+
 void RenderDevice::DrawColor(const UIDrawData& data) {
 	UIDrawData buff(data);
 	buff.flag |= UICOLORED;

@@ -51,6 +51,8 @@ public:
 	void RegisterImg(size_t id, const Float3Data& text);
 	void RegisterImg(size_t id, int width, int heights, void* data);
 	bool WasIdUsed(size_t id);
+	bool IsMeshIdUsed(size_t id);
+	bool IsTextureIdUsed(size_t id);
 
 	void UpdateImg(size_t id, const TextureData& text);
 	void UpdateImg(const ImageUpdate&);
@@ -63,9 +65,7 @@ public:
 	void RegisterOpaqueModel(size_t id, const OpaqueMesh& model);
 	void ReleaseModel(size_t id);
 
-
-
-
+	
 	void DrawModel(const ModelDrawData& drawData);
 	void DrawUserPolygon(MeshHashData model, size_t textureId, UPDrawData data);
 	void DrawUserPolygon(MeshHashData model, size_t textureId, size_t lightmapId, UPDrawData data);

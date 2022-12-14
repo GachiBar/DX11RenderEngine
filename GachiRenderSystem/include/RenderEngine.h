@@ -78,6 +78,8 @@ struct RenderDevice {
 	void RegisterModel(size_t id, const OpaqueMesh&);
 	void ReleaseTexture(size_t id);
 	bool WasIdUsed(size_t id);
+	bool IsMeshIdUsed(size_t id);
+	bool IsTextureIdUsed(size_t id);
 
 
 	/* Drawing */

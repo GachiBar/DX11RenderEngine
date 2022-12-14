@@ -402,7 +402,17 @@ void RenderSystem::RegisterImg(size_t id, int width, int height, void* data)
 
 bool RenderSystem::WasIdUsed(size_t id)
 {
-    return (texturesManger->WasIdUsed(id) || modelsManager->WasIdUsed(id));
+    return IsTextureIdUsed(id) || IsMeshIdUsed(id);
+}
+
+bool RenderSystem::IsTextureIdUsed(size_t id)
+{
+    return texturesManger->WasIdUsed(id);
+}
+
+bool RenderSystem::IsMeshIdUsed(size_t id)
+{
+    return modelsManager->WasIdUsed(id);
 }
 
 void RenderSystem::DrawModel(const ModelDrawData& drawData)
