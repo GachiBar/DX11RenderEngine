@@ -168,7 +168,7 @@ float4 CalculateLightSimple(GBufferData buf, float4 ViewerPos)
 	// Direct lighting calculation for analytical lights.
 	float3 directLighting = 0.0;
 	
-	float3 Li = lightCosntBuffer.Light.Dir.xyz;
+	float3 Li = -lightCosntBuffer.Light.Dir.xyz;
 	float3 Lradiance = lightCosntBuffer.Light.Params.x * lightCosntBuffer.Light.Color.xyz;
 	// Half-vector between Li and Lo.
 	float3 Lh = normalize(Li + Lo);

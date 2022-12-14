@@ -97,7 +97,7 @@ void DebugRenderPass::Render()
     renderDevice->GetMainViewportSize(width, height);
 
     RenderTargetBinding* targets[] = {
-        baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("outTexture")),
+        baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("preAAcolor")),
     };
 
     renderDevice->SetRenderTargets(targets, std::size(targets), nullptr);
