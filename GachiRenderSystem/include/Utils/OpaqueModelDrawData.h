@@ -11,10 +11,21 @@ struct DiffuseData {
     DiffuseData(TextureData::Color color):isTextured(false), color(color) {};
     DiffuseData(uint64_t color):isTextured(true), textureId(color) {};
     DiffuseData(const DiffuseData& data):
-    isTextured(data.isTextured),
-    dummy1(data.dummy1),
-    dummy2(data.dummy2)
-    {};
+        isTextured(data.isTextured),
+        dummy1(data.dummy1),
+        dummy2(data.dummy2)
+        {};
+    
+    DiffuseData& operator=(const DiffuseData& other)
+    {
+        if (this != &other)
+        {
+            this->isTextured = other.isTextured;
+            this->color = other.color;
+        }
+        return *this;
+    }
+    
     union {
         struct {
             uint64_t dummy1;
@@ -80,6 +91,18 @@ struct MaterialData {
     NormalData    normalData;
     RoughnessData roughnessData;
     MetallicData  metallicData;
+
+    MaterialData& operator=(const MaterialData& other)
+    {
+        if (this != &other)
+        {
+            diffuseData = other.diffuseData;
+            normalData = other.normalData;
+            roughnessData = other.roughnessData;
+            metallicData = other.metallicData;
+        }
+        return *this;
+    }
 };
 
 struct OpaqueFlags {
