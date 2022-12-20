@@ -92,6 +92,14 @@ struct MaterialData {
     RoughnessData roughnessData;
     MetallicData  metallicData;
 
+    MaterialData():
+        diffuseData(TextureData::Color(255,255,255,255)),
+        normalData(Float3Data::Color(1,0,0)),
+        roughnessData(0),
+        metallicData(0)
+    {      
+    }
+    
     MaterialData& operator=(const MaterialData& other)
     {
         if (this != &other)
