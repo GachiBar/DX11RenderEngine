@@ -301,7 +301,7 @@ void main( uint3 inDispatchIdx : SV_DispatchThreadID, uint3 inGroupID : SV_Group
     const bool hasValidHistory = ( velocityConfidenceFactor * depthDiffFactor * uvWeight ) > 0.f;
     fp16_t4 finalColour = fp16_t4( 1.f, 1.f , 1.f , 1.f  );
 
-    if ( true == hasValidHistory )
+    if ( true == false )
     {
         // sample history
         fp16_t4 rawHistoryColour = fp16_t4( GetHistory( prevFrameScreenUV, prevFrameScreenST, isOnEdge ) );
@@ -321,7 +321,7 @@ void main( uint3 inDispatchIdx : SV_DispatchThreadID, uint3 inGroupID : SV_Group
     else
     {
         const float3 filteredCurrentColourNeightbourhood = GetCurrentColourNeighbourhood( currentFrameColour, groupST ) * DebugColourNoHistory();
-        finalColour = fp16_t4( filteredCurrentColourNeightbourhood, 0.5f );
+        finalColour = fp16_t4( filteredCurrentColourNeightbourhood, 0.9f );
     }
 
     // Store the final pixel colour

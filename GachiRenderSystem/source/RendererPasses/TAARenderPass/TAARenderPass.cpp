@@ -119,7 +119,7 @@ void TAARenderPass::Render()
 	//renderDevice->SetRenderTargets(nullptr, 0, nullptr, vp);
 	
 	renderDevice->VerifyPixelTexture(0, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("velocityField"		 ))->texture);
-	renderDevice->VerifyPixelTexture(1, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("diffuseTexture"		 ))->texture);
+	renderDevice->VerifyPixelTexture(1, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("preAAcolor"		 ))->texture);
 	renderDevice->VerifyPixelTexture(2, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("pastColor"			 ))->texture);
 	renderDevice->VerifyPixelTexture(3, baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("pastDepth"		     ))->texture);
 	renderDevice->VerifyPixelTexture(4, baseRendererParams.renderSystem.texturesManger->depthBuffer->texture					     );

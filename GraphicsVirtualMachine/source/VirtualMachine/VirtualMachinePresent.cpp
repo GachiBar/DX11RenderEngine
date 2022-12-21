@@ -105,7 +105,7 @@ void VirtualMachine::ExecuteSetupPipeline(Compressed::PipelineSnapshot* ps)
             uaTargets[i] = nullptr;
         }
 
-        RenderDevice->SetupUATargets((IRenderDevice::UATARGETVIEWHANDLE*)uaTargets, ps->renderTargetsNum);
+        RenderDevice->SetupUATargets((IRenderDevice::UATARGETVIEWHANDLE*)uaTargets, ps->uaTargetsNum);
     }
 
 

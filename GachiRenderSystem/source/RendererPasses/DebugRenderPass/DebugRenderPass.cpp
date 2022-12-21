@@ -78,7 +78,7 @@ void DebugRenderPass::Init(const char* dirr)
 void DebugRenderPass::PreRender()
 {
     RenderTargetBinding* targets[5] = {
-        baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("preAAcolor")),
+        baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("outTexture")),
         baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("lightColor")),
         baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("velocityField")),
         baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("blurMask")),
@@ -97,7 +97,7 @@ void DebugRenderPass::Render()
     renderDevice->GetMainViewportSize(width, height);
 
     RenderTargetBinding* targets[] = {
-        baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("preAAcolor")),
+        baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("outTexture")),
     };
 
     renderDevice->SetRenderTargets(targets, std::size(targets), nullptr);
