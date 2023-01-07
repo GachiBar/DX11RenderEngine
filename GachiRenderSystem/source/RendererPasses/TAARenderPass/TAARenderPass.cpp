@@ -150,7 +150,7 @@ void TAARenderPass::Render()
 
 	renderDevice->VerifyPixelTexture(1, nullptr);
 
-	RenderImGUI();
+	//RenderImGUI();
 }
 
 
