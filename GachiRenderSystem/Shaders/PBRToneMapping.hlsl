@@ -44,28 +44,28 @@ else
 
 #endif
 
-#ifdef CopyColor
-	final.rgb = hdr;
-#elif Simple
-	
-	final.rgb = hdr.rgb / (hdr + 1.0f);
-	
-#elif WithLum
-	
-	final.rgb = float3(1.0f, 1.0f, 1.0f) - exp(-hdr * postProcessCosntBuffer.lum);
-
-#elif WithLumEx
+//#ifdef CopyColor
+//	final.rgb = hdr;
+//#elif Simple
+//	
+//	final.rgb = hdr.rgb / (hdr + 1.0f);
+//	
+//#elif WithLum
+//	
+//	final.rgb = float3(1.0f, 1.0f, 1.0f) - exp(-hdr * postProcessCosntBuffer.lum);
+//
+//#elif WithLumEx
 	
 	//float fLum = lum[0]*g_param.x;
     float3 vBloom = float3(0,0,0); // bloom.Sample( LinearSampler, Input.Tex );
     // Tone mapping
     final.rgb = hdr.rgb;
-	final.rgb *= MIDDLE_GRAY / (postProcessCosntBuffer.lum + 0.001f);
+	final.rgb *= MIDDLE_GRAY / (1 + 0.001f);
     final.rgb *= (1.0f + final.rgb/LUM_WHITE);
     final.rgb /= (1.0f + final.rgb);
     final.rgb += 0.6f * vBloom; // Adding bloom
 	
-#endif
+//#endif
 	
 	final.a = 1.0f;
 	

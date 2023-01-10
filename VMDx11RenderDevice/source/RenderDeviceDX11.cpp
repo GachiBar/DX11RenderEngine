@@ -819,7 +819,7 @@ D3D11_DEPTH_STENCIL_DESC ToDX11DSState(const Compressed::DepthStencilStateDesc& 
 
 ID3D11DepthStencilState* RenderDeviceDX11::FetchDepthStencilState(const Compressed::DepthStencilStateDesc& depthStencilState)
 {
-    if (hashDSS.contains(depthStencilState.data))
+    if (!hashDSS.contains(depthStencilState.data))
     {
         ID3D11DepthStencilState* ds;
         auto desc = ToDX11DSState(depthStencilState);
@@ -833,11 +833,10 @@ ID3D11DepthStencilState* RenderDeviceDX11::FetchDepthStencilState(const Compress
 void RenderDeviceDX11::SetupDepthStencilState(const Compressed::DepthStencilStateDesc& depthStencilState)
 {
     auto ds = FetchDepthStencilState(depthStencilState);
-    if (ds != depthStencilStatePtr)
-    {
+
         depthStencilStatePtr = ds;
         context->OMSetDepthStencilState(depthStencilStatePtr, 0);
-    }
+ 
 }
 
 

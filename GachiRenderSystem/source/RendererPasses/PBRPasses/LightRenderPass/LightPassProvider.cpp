@@ -10,18 +10,18 @@
 #include "Utils/DrawData.h"
 void LightPassProvider::PatchPipelineState(Renderer::Pipeline* refToPS, uint32_t pipelineFlags)
 {
-    ModelsFlags flags;
+    LightFlags flags;
     flags.flags = pipelineFlags;
-    refToPS->bs = &BlendStates::Add;
+    refToPS->bs = &BlendStates::Light;
 
     refToPS->dss = &DepthStencilStates::NoDSS;
 
     refToPS->rs = &RasterizerStates::CClockWise;
 
-    if (flags.isWireframe)
-    {
-        refToPS->rs = &RasterizerStates::Wireframe;
-    }
+   //if (flags.isWireframe)
+   //{
+   //    refToPS->rs = &RasterizerStates::Wireframe;
+   //}
 }
 
 const D3D11_INPUT_ELEMENT_DESC SQInputElements[] =
