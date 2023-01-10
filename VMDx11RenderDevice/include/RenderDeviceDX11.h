@@ -142,7 +142,7 @@ private:
     size_t backBufferWidth;
     size_t backBufferHeight;
     ID3D11RenderTargetView* swapchainRTView;
-    ID3D11UnorderedAccessView* swapchainUAView;
+    //ID3D11UnorderedAccessView* swapchainUAView;
     std::vector<ID3D11RenderTargetView*> renderTargetViews;
     std::vector<ID3D11UnorderedAccessView*> uaViews;
 	

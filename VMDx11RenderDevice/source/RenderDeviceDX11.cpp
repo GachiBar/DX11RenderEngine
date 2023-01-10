@@ -157,6 +157,12 @@ RenderDeviceDX11::RenderDeviceDX11(const RenderDeviceInitParams& initParams, boo
         &swapchainRTView
     ));
 
+    //GFX_THROW_INFO(device->CreateUnorderedAccessView(
+    //    swapchainTexture.Get(),
+    //    NULL,
+    //    &swapchainUAView
+    //));
+
     
     this->vertexBuffers.resize(32);
     this->vertexBufferOffsets.resize(32);
@@ -1320,7 +1326,6 @@ void RenderDeviceDX11::ResizeBackbuffer(int32_t width, int32_t height)
 
     // Release all outstanding references to the swap chain's buffers.
     swapchainRTView->Release();
-    swapchainUAView->Release();
     // Preserve the existing buffer count and format.
     // Automatically choose the width and height to match the client rect for HWNDs.
     hr = swapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
@@ -1335,8 +1340,6 @@ void RenderDeviceDX11::ResizeBackbuffer(int32_t width, int32_t height)
 
     hr = device->CreateRenderTargetView(pBuffer, NULL,
                                              &swapchainRTView);
-    hr = device->CreateUnorderedAccessView(pBuffer, NULL,
-                                             &swapchainUAView);
     // Perform error handling here!
     pBuffer->Release();
 
