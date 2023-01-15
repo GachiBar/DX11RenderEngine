@@ -1327,18 +1327,18 @@ void RenderDeviceDX11::ResizeBackbuffer(int32_t width, int32_t height)
     swapchainRTView->Release();
     // Preserve the existing buffer count and format.
     // Automatically choose the width and height to match the client rect for HWNDs.
-    hr = swapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+    GFX_THROW_INFO(swapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
                                             
     // Perform error handling here!
 
     // Get buffer and create a render-target-view.
     ID3D11Texture2D* pBuffer;
-    hr = swapchain->GetBuffer(0, __uuidof( ID3D11Texture2D),
-                                 (void**) &pBuffer );
+    GFX_THROW_INFO(swapchain->GetBuffer(0, __uuidof( ID3D11Texture2D),
+                                 (void**) &pBuffer ));
     // Perform error handling here!
 
-    hr = device->CreateRenderTargetView(pBuffer, NULL,
-                                             &swapchainRTView);
+    GFX_THROW_INFO(device->CreateRenderTargetView(pBuffer, NULL,
+                                             &swapchainRTView));
     // Perform error handling here!
     pBuffer->Release();
 

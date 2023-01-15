@@ -69,7 +69,7 @@ void PostProcessRenderPass::Render()
 
 	renderDevice->VerifyPixelTexture(1, nullptr);
 
-	RenderImGUI();
+	//RenderImGUI();
 }
 
 
