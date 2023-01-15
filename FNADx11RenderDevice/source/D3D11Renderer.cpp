@@ -495,11 +495,8 @@ void D3D11Renderer::VerifyPixelTexture(int32_t index, const Texture* texture)
     }
 
     /* Bind the correct texture */
-    if (!pixelTextures[index] || d3dTexture != pixelTextures[index])
-    {
-        pixelTextures[index] = d3dTexture;
-        testApi->SetupTexture(d3dTexture->shView, index);
-    }
+    pixelTextures[index] = d3dTexture;
+    testApi->SetupTexture(d3dTexture->shView, index);
 }
 
 void D3D11Renderer::VerifyUATexture(int32_t index, const Texture* texture)
