@@ -24,7 +24,9 @@ RenderSystem::RenderSystem(RenderEngineCoreSettings init, const BaseRenderSystem
     renderPassModels(*this),
     renderPassIMGUI({"", *this}),
     renderPassTAA(*this),
+#if _DEBUG
     renderPassDebug(*this),
+#endif
     renderPassOpaque(*this),
     renderPassLight(*this),
     renderPassPP(*this),
@@ -49,7 +51,9 @@ RenderSystem::RenderSystem(RenderEngineCoreSettings init, const BaseRenderSystem
     gachRenderPasses.push_back(&renderPassUI);
     gachRenderPasses.push_back(&renderPassModels);
     gachRenderPasses.push_back(&renderPassTAA);
+#if _DEBUG
     gachRenderPasses.push_back(&renderPassDebug);
+#endif
     gachRenderPasses.push_back(&renderPassOpaque);
     gachRenderPasses.push_back(&renderPassLight);
     gachRenderPasses.push_back(&renderPassPP);

@@ -114,6 +114,18 @@
     <ClCompile Include="source\RendererPasses\PBR\PassLighting.cpp">
       <Filter>PBR</Filter>
     </ClCompile>
+    <ClCompile Include="source\RendererPasses\PBRPasses\LightRenderPass\LightPassProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\RendererPasses\PBRPasses\LightRenderPass\LightRenderPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\RendererPasses\PBRPasses\PostProcessRenderPass\PostProcessRenderPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\RendererPasses\PBRPasses\PostProcessRenderPass\PostProcessRenderPassProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\RenderEngine.h">
@@ -227,7 +239,25 @@
     <ClInclude Include="source\RendererPasses\PBRPasses\OpaqueRenderPass\OpaquePassProvider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\RendererPasses\PBRPasses\LightRenderPass\Lights.h">
+    <ClInclude Include="include\Utils\Lights.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RendererPasses\PBRPasses\LightRenderPass\LightPassConstBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RendererPasses\PBRPasses\LightRenderPass\LightPassProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RendererPasses\PBRPasses\LightRenderPass\LightRenderPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RendererPasses\PBRPasses\PostProcessRenderPass\PostProcessRenderPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RendererPasses\PBRPasses\PostProcessRenderPass\PostProcessRenderPassConstBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RendererPasses\PBRPasses\PostProcessRenderPass\PostProcessRenderPassProvider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -274,10 +304,11 @@
     <None Include="Shaders\PBRFillGBuffer.hlsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="source\RendererPasses\PBR\Shaders\PBRLighting.hlsl" />
     <None Include="source\RendererPasses\PBR\Shaders\PBRToneMapping.hlsl" />
     <None Include="source\RendererPasses\PBR\Shaders\SkyRenderingPS.hlsl" />
     <None Include="source\RendererPasses\PBR\Shaders\SkyRenderingVS.hlsl" />
     <None Include="source\RendererPasses\PBR\Shaders\SkyUpdatePS.hlsl" />
+    <None Include="Shaders\PBRLighting.hlsl" />
+    <None Include="Shaders\PBRToneMapping.hlsl" />
   </ItemGroup>
 </Project>

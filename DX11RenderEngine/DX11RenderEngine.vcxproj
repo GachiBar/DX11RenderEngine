@@ -264,6 +264,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)include\; $(ProjectDir)source\; $(ProjectDir)..\FNABaseStructs\include\; $(ProjectDir)..\FNADx11RenderDevice\include\; $(ProjectDir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

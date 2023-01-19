@@ -248,6 +248,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)include\;$(ProjectDir)source\;$(ProjectDir)..\GraphicsVirtualMachine\include\;$(ProjectDir)..\GVMBaseStructures\include\;$(ProjectDir)..\FNABaseStructs\include\;$(ProjectDir)..\VMDx11RenderDevice\include\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
