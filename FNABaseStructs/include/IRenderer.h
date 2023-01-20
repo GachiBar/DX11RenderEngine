@@ -5,6 +5,7 @@
 #include "IRenderer/RasterizerState.h"
 #include "IRenderer/SamplerState.h"
 #include "PipelineState.h"
+#include <vector>
 
 namespace Renderer
 {
@@ -39,7 +40,9 @@ namespace Renderer
         /* Destroys a rendering context previously returned by CreateDevice. */
         virtual ~IRenderer()
         {
-        };
+        }
+
+        virtual void GetDataFrom(RenderTargetBinding* renderTarget, std::vector<std::vector<uint32_t>>& dst) = 0;
 
 
         /* After your window is created, call this to check for high-DPI support.

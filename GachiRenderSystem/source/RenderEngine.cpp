@@ -218,3 +218,8 @@ void RenderDevice::DestroyDevice() {
 	if (gfx) delete gfx;
 	gfx = nullptr;
 }
+
+uint32_t RenderDevice::GetObjectId(uint32_t x, uint32_t y)
+{
+	return gfx->GetObjectId(x, y);
+}

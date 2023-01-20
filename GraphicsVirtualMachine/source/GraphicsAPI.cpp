@@ -480,3 +480,8 @@ void GraphicsApi::AddDisposeIL(InputLayout* input_layout)
 {
     //todo
 }
+
+void GraphicsApi::GetDataFrom(ShaderResourceViewDesc resource, std::vector<std::vector<unsigned>>& dst)
+{
+    graphicsMachine->GetDataFrom(resource, dst);
+}

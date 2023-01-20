@@ -215,6 +215,13 @@ protected:
 public:
     
     void GetBackbufferSize(uint32_t& w, uint32_t& h) override;
+
+
+    
+    wrl::ComPtr<ID3D11Texture2D> stagingTexture = NULL;
+    uint32_t stagingTextureWidth = 0;
+    uint32_t stagingTextureHeight = 0;
+    void GetData(RESOURCEHANDLE resource,ShaderResourceViewDesc desc, std::vector<std::vector<uint32_t>>& dst) override;
 protected:
     void SyncBlockExecutionStart() override;
     void SyncResourcesRead(IResource** data, size_t size) override;

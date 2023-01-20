@@ -15,6 +15,7 @@ struct OpaqueCosntBuffer {
     
     float MetallicMult;
     float RoughnessMult;
+    uint  id;
     
 };
 

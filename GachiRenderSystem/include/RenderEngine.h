@@ -26,6 +26,7 @@ struct RenderDevice {
 	/* Quit */
 
 	void DestroyDevice();
+	uint32_t GetObjectId(uint32_t x, uint32_t y);
 
 
 	enum class ShaderType {

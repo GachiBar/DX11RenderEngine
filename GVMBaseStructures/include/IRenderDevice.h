@@ -161,6 +161,7 @@ public:
 
     virtual void ClearRenderTarget(RENDERTARGETVIEWHANDLE rtView, FColor color) = 0;
     virtual void ClearDepthStencil(DEPTHSTENCILVIEWHANDLE dsView, float depth, int8_t stencil) = 0;
+    virtual void GetData(RESOURCEHANDLE resource, ShaderResourceViewDesc desc, std::vector<std::vector<uint32_t>>& dst) = 0;
 
     virtual void ResizeBackbuffer(int32_t width, int32_t height) = 0;
 

@@ -113,6 +113,7 @@ struct PSOutput
 	float4 MetRougAo	: SV_Target2;
 	float4 Emissive		: SV_Target3; // Emissive Color
 	float4 WorldPos		: SV_Target4;
+	uint   id		    : SV_Target5;
 };
 
 
@@ -179,5 +180,6 @@ PSOutput psIn(PS_IN input)
 	
 	ret.MetRougAo = float4(metallic * opaqueCosntBuffer.MetallicMult, roughness * opaqueCosntBuffer.RoughnessMult, 1.0f, 1.0f);
 
+	ret.id = opaqueCosntBuffer.id;
 	return ret;
 }

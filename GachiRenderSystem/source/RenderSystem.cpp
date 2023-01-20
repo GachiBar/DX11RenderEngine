@@ -234,6 +234,7 @@ bool RenderSystem::EndFrame()
     pRenderer->EndEvent();
 
 
+    
     pRenderer->BeginEvent("Light draw.");
     GFX_CATCH_RENDER(renderPassLight.Render());
     pRenderer->EndEvent();
@@ -290,6 +291,19 @@ bool RenderSystem::EndFrame()
     if (!success)
         PostRender();
     return success;
+}
+
+uint32_t RenderSystem::GetObjectId(uint32_t x, uint32_t y)
+{
+    if (y < renderPassOpaque.idData.size() && x < renderPassOpaque.idData[0].size())
+    {
+        return renderPassOpaque.idData[y][x];
+    }
+    else
+    {
+        return 0;
+    }
+    
 }
 
 void RenderSystem::LambdaCallback(const ImDrawList* parent_list, const ImDrawCmd* cmd)

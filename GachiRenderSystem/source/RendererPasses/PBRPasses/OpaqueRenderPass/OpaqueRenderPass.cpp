@@ -63,6 +63,7 @@ OpaqueRenderPass::OpaqueRenderPass(BaseRenderSystem& renderSystem) : GachiBasePa
     renderSystem.texturesManger->CreatePublicRenderTarget({"WorldPosition"  , SurfaceFormat::SURFACEFORMAT_VECTOR4, false, true});
     renderSystem.texturesManger->CreatePublicRenderTarget({"AccumulationBuf", SurfaceFormat::SURFACEFORMAT_VECTOR4, false, true});
     renderSystem.texturesManger->CreatePublicRenderTarget({"Bloom"          , SurfaceFormat::SURFACEFORMAT_VECTOR4, false, true});
+    renderSystem.texturesManger->CreatePublicRenderTarget({"Id"             , SurfaceFormat::SURFACEFORMAT_UINT, false, true});
 }
 
 void OpaqueRenderPass::Draw(const OpaqueModelDrawData& drawData)
@@ -95,6 +96,7 @@ void OpaqueRenderPass::PreRender()
         baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("WorldPosition"   )),
         baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("AccumulationBuf" )),
         baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("Bloom"           )),
+        baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("Id"           )),
     };
 
     renderDevice->SetRenderTargets(targets, std::size(targets), baseRendererParams.renderSystem.texturesManger->depthBuffer);
@@ -121,6 +123,7 @@ void OpaqueRenderPass::Render()
         baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("MetRougAo"      )),
         baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("Emissive"       )),
         baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("WorldPosition"  )),
+        baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("Id"  )),
     };
 
     renderDevice->SetRenderTargets(targets, std::size(targets), baseRendererParams.renderSystem.texturesManger->depthBuffer);
@@ -158,6 +161,7 @@ void OpaqueRenderPass::Render()
         dataBuffer.MetallicMult = drawCalls[i].data.MetallicMult;
         dataBuffer.RoughnessMult = drawCalls[i].data.RoughnessMult;
         dataBuffer.normal = material.normalData.normal;
+        dataBuffer.id = i+1;
         
         //if (drawCalls[i].data.isGun)
         //	dataBuffer.blurSwitch = 1.f;
@@ -171,6 +175,8 @@ void OpaqueRenderPass::Render()
             drawCalls[i].model.pt, 0, 0, 0, 0,
             drawCalls[i].model.primitiveCount);
     }
+
+    renderDevice->GetDataFrom(baseRendererParams.renderSystem.texturesManger->GetRenderTarget(SID("Id"  )), idData);
 }
 
 void OpaqueRenderPass::PostRender()

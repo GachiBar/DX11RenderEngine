@@ -44,6 +44,7 @@ public:
     void PostRender() override;
     ~OpaqueRenderPass() override;
     void SetupSettings(const RenderSettings& Settings) override;
+    std::vector<std::vector<uint>> idData;
 
 private:
     OpaqueCosntBuffer dataBuffer;

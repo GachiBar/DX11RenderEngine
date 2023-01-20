@@ -144,6 +144,7 @@ enum class EMachineCommands : uint8_t {
     CLEAR_PIPELINE,
     CLEAR_RT,
     CLEAR_DS,
+    GET_DATA,
 
     DRAW,
     BEGIN_EVENT,
@@ -182,6 +183,11 @@ struct ClearDepthStencilDesc{
 
 struct BeginEventDesc{
     const char* name;
+};
+
+struct GetDataDesc{
+    ShaderResourceViewDesc resource;
+    std::vector<std::vector<uint32_t>>& dst;
 };
 
 

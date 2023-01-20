@@ -307,6 +307,20 @@ void VirtualMachine::PushCommand(EMachineCommands command)
             );
             break;
         }
+    case EMachineCommands::GET_DATA:
+        {
+            auto& desc = PullData<GetDataDesc>();
+            renderGraph.AddCommand(
+                {
+                    EMachineCommands::GET_DATA,
+                    (void*)
+                    ((uint8_t*)&desc - dataQueue.data())
+                },
+                {desc.resource.Resource},
+                {}
+            );
+            break;
+        }
     case EMachineCommands::BEGIN_EVENT:
         {
             const char* name = (const char*)dataQueue.data() + queueShift;
@@ -464,6 +478,19 @@ void VirtualMachine::RunVM()
                         (IRenderDevice::DEPTHSTENCILVIEWHANDLE)resourcesManager.GetRealResourceView(desc.resource),
                         desc.depth,
                         desc.stencil
+                    );
+                    break;
+                }
+            case EMachineCommands::GET_DATA:
+                {
+                    auto& desc = *(GetDataDesc*)(dataQueue.data() + (uint32_t)description);
+                    //auto& resource = PullData<DepthStencilView*>();
+                    //auto& depth = PullData<float>();
+                    //auto& stencil = PullData<uint8_t>();
+                    RenderDevice->GetData(
+                        (IRenderDevice::RESOURCEHANDLE)resourcesManager.GetRealResource(desc.resource.Resource),
+                        desc.resource,
+                        desc.dst
                     );
                     break;
                 }

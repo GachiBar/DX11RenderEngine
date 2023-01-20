@@ -931,6 +931,25 @@ void D3D11Renderer::SetTextureData2D(Texture* texture, int32_t x, int32_t y, int
 
 #pragma warning(push)
 #pragma warning(disable : 26451)
+
+void D3D11Renderer::GetDataFrom(RenderTargetBinding* renderTarget, std::vector<std::vector<uint32_t>>& dst)
+{
+    D3D11Texture* texture = ( D3D11Texture*)renderTarget->texture;
+    GVM::ShaderResourceViewDesc shv{
+        texture->resource,
+    false,
+        ToGVM(texture->format),
+        GVM::EShaderViewDimension::DIMENSION_TEXTURE2D,
+        
+    };
+    shv.T2Desc = GVM::TEX2DDesc{
+        (uint32_t)texture->width,
+        float(texture->height)
+    };
+    testApi->GetDataFrom(shv, dst);
+}
+
+
 void D3D11Renderer::GetTextureData2D(const Texture* texture, int32_t x, int32_t y, int32_t w, int32_t h,
     int32_t level, void* data, int32_t dataLength)
 {

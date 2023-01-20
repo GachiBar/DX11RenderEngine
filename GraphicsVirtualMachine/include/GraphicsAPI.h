@@ -194,5 +194,6 @@ public:
     void* GetNativeTexture(const ShaderResourceView* shView);
     void AddDisposeShader(Shader* shader);
     void AddDisposeIL(InputLayout* input_layout);
+    void GetDataFrom(ShaderResourceViewDesc resource, std::vector<std::vector<unsigned>>& dst);
 };
 }

@@ -200,6 +200,7 @@ public:
         uint32_t offset);
     
     void* GetNativeTexture(const ShaderResourceView* shView);
+    void GetDataFrom(ShaderResourceViewDesc resource, std::vector<std::vector<unsigned>>& dst);
 
 #pragma endregion
 

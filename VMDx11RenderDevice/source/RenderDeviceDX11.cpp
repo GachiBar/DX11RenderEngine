@@ -1366,6 +1366,108 @@ void RenderDeviceDX11::GetBackbufferSize(uint32_t& w, uint32_t& h)
     w = backBufferWidth;
     h = backBufferHeight;
 }
+
+void RenderDeviceDX11::GetData(RESOURCEHANDLE resource, ShaderResourceViewDesc texDesc, std::vector<std::vector<uint32_t>>& dst)
+{
+    D3D11_TEXTURE2D_DESC stagingDesc;
+	ID3D11Resource* srcTexture = (ID3D11Resource*)resource;
+    
+	uint32_t subresourceIndex = 0;
+	int32_t texW = texDesc.T2Desc.PlaneSlice;
+	int32_t texH = texDesc.T2Desc.ResourceMinLODClamp;
+	D3D11_BOX srcBox = {0, 0, 0, (UINT)texW, (UINT)texH, 1};
+	D3D11_MAPPED_SUBRESOURCE subresource;
+	int32_t row;
+	int32_t formatSize = 4;
+	HRESULT res;
+
+	/* Create staging texture if needed */
+	
+    if (stagingTexture == NULL || (texH != stagingTextureHeight || texW != stagingTextureWidth))
+    {
+        if (stagingTexture != NULL)
+            stagingTexture->Release();
+        stagingTextureHeight = texH;
+        stagingTextureWidth = texW;
+        
+        stagingDesc.Width = texW;
+        stagingDesc.Height = texH;
+        stagingDesc.MipLevels = 1;
+        stagingDesc.ArraySize = 1;
+        stagingDesc.Format = DXGI_FORMAT_R32_UINT;
+        stagingDesc.SampleDesc.Count = 1;
+        stagingDesc.SampleDesc.Quality = 0;
+        stagingDesc.Usage = D3D11_USAGE_STAGING;
+        stagingDesc.BindFlags = 0;
+        stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        stagingDesc.MiscFlags = 0;
+
+        res = device->CreateTexture2D(
+            &stagingDesc,
+            NULL,
+            &stagingTexture
+        );
+    }
+
+	/* Copy data into staging texture */
+	context->CopySubresourceRegion(
+		stagingTexture.Get(),
+		subresourceIndex,
+		0,
+		0,
+		0,
+		srcTexture,
+		subresourceIndex,
+		&srcBox
+	);
+
+	/* Read from the staging texture */
+	res = context->Map(
+		stagingTexture.Get(),
+		subresourceIndex,
+		D3D11_MAP_READ,
+		0,
+		&subresource
+	);
+
+    dst.resize(texH);
+	for (row = 0; row < texH; row += 1)
+	{
+	    dst[row].resize(texW);
+		memcpy(
+			dst[row].data(),
+			(uint8_t*) subresource.pData + (row * subresource.RowPitch) + (0 * formatSize),
+			formatSize * texW
+		);
+	}
+	context->Unmap(
+		stagingTexture.Get(),
+		subresourceIndex
+	);
+    //if (texW < 150 && texH < 200)
+    //{
+    //    std::cout<<std::endl<<std::flush;
+    //    std::cout<<"TEST";
+    //    std::cout<<std::endl<<std::flush;
+    //    for (row = 0; row < texH; row += 1)
+    //    {
+    //       for (uint32_t col = 0; col < texW; col++)
+    //       {
+    //           if (dst[row][col] < 10)
+    //            std::cout<<dst[row][col];
+    //           else
+    //           {
+    //            std::cout<<0;
+    //               
+    //           }
+    //       }std::cout<<std::endl<<std::flush;
+    //    }
+    //    std::cout<<std::endl<<std::flush;
+    //    std::cout<<std::endl<<std::flush;
+    //    std::cout<<std::endl<<std::flush;
+    //}
+}
+
 void RenderDeviceDX11::SyncBlockExecutionStart() {}
 void RenderDeviceDX11::SyncResourcesRead(IResource** data, size_t size) {}
 void RenderDeviceDX11::SyncResourcesWrite(IResource** data, size_t size)

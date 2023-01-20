@@ -40,7 +40,8 @@ public:
 
 	void BeginFrame();
 	bool EndFrame();
-	
+	uint32_t GetObjectId(uint32_t x, uint32_t y);
+
 	static void LambdaCallback(const ImDrawList* parent_list, const ImDrawCmd* cmd);
 
 

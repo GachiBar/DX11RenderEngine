@@ -342,3 +342,9 @@ void* VirtualMachine::GetNativeTexture(const ShaderResourceView* shView)
     auto view = resourcesManager.GetRealResourceView(shView);
     return RenderDevice->GetNativeTexture(view);
 }
+
+void VirtualMachine::GetDataFrom(ShaderResourceViewDesc resource, std::vector<std::vector<unsigned>>& dst)
+{
+    PushData(GetDataDesc{resource,dst});
+    PushCommand(EMachineCommands::GET_DATA);
+}

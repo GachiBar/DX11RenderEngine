@@ -144,6 +144,7 @@ public:
 	virtual void AddDisposeTexture(Texture* texture) override;
 	virtual void SetTextureData2D(Texture* texture, int32_t x, int32_t y, int32_t w, int32_t h, int32_t level, void* data, int32_t dataLength) override;
 	virtual void GetTextureData2D(const Texture* texture, int32_t x, int32_t y, int32_t w, int32_t h, int32_t level, void* data, int32_t dataLength) override;
+	virtual void GetDataFrom(RenderTargetBinding* renderTarget, std::vector<std::vector<uint32_t>>& dst) override;
 
 	virtual Renderbuffer* GenColorRenderbuffer(int32_t width, int32_t height, SurfaceFormat format, int32_t multiSampleCount, Texture* texture) override;
 	virtual Renderbuffer* GenDepthStencilRenderbuffer(int32_t width, int32_t height, DepthFormat format, int32_t multiSampleCount) override;
