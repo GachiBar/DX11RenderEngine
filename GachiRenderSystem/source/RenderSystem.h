@@ -110,10 +110,8 @@ private:
 	LightRenderPass			 renderPassLight;
 	PostProcessRenderPass	 renderPassPP;
 	
-#if _DEBUG
 	DebugRenderPass	         renderPassDebug;
 
-#endif
 	//MotionBlurRenderer	 managerMB;
 	//UPRenderer			 managerUP;
 	//PPRenderer			 managerPostProcess;

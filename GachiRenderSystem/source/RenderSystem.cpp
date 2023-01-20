@@ -24,9 +24,7 @@ RenderSystem::RenderSystem(RenderEngineCoreSettings init, const BaseRenderSystem
     renderPassModels(*this),
     renderPassIMGUI({"", *this}),
     renderPassTAA(*this),
-#if _DEBUG
     renderPassDebug(*this),
-#endif
     renderPassOpaque(*this),
     renderPassLight(*this),
     renderPassPP(*this),
@@ -51,9 +49,7 @@ RenderSystem::RenderSystem(RenderEngineCoreSettings init, const BaseRenderSystem
     gachRenderPasses.push_back(&renderPassUI);
     gachRenderPasses.push_back(&renderPassModels);
     gachRenderPasses.push_back(&renderPassTAA);
-#if _DEBUG
     gachRenderPasses.push_back(&renderPassDebug);
-#endif
     gachRenderPasses.push_back(&renderPassOpaque);
     gachRenderPasses.push_back(&renderPassLight);
     gachRenderPasses.push_back(&renderPassPP);
@@ -101,16 +97,12 @@ void RenderSystem::ReloadShaders(const char* shadersDirr)
 
 void RenderSystem::DrawDebug(const DebugDraw3DData& drawData)
 {
-#if _DEBUG
     renderPassDebug.Draw(drawData);
-#endif
 }
 
 void RenderSystem::DrawDebug(const DebugDraw2DData& drawData)
 {
-#if _DEBUG
     renderPassDebug.Draw(drawData);
-#endif
 }
 
 void RenderSystem::ResizeBackBuffer(uint32_t width, uint32_t height)
@@ -273,11 +265,9 @@ bool RenderSystem::EndFrame()
     pRenderer->EndEvent();
 
     BaseRenderSystem::Setup();
-#if _DEBUG
     pRenderer->BeginEvent("Debug draw.");
     GFX_CATCH_RENDER(renderPassDebug.Render());
     pRenderer->EndEvent();
-#endif
 
     pRenderer->BeginEvent("IMGUI draw.");
     renderPassIMGUI.Render();
