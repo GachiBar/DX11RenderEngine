@@ -161,7 +161,7 @@ void OpaqueRenderPass::Render()
         dataBuffer.MetallicMult = drawCalls[i].data.MetallicMult;
         dataBuffer.RoughnessMult = drawCalls[i].data.RoughnessMult;
         dataBuffer.normal = material.normalData.normal;
-        dataBuffer.id = i+1;
+        dataBuffer.id = drawCalls[i].data.objectId;
         
         //if (drawCalls[i].data.isGun)
         //	dataBuffer.blurSwitch = 1.f;

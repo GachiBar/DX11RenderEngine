@@ -128,6 +128,6 @@ struct OpaqueModelDrawData {
     
     
     MaterialData materialData;
-    
+     uint32_t objectId;
     OpaqueFlags flags;
 };
